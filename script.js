@@ -175,14 +175,27 @@ function restartViewAnimation(className) {
 
 function setWelcomeTitle() {
   const welcomeLine = document.createElement("span");
+  const welcomePrefix = document.createElement("span");
+  const welcomeName = document.createElement("span");
   const journeyLine = document.createElement("span");
   const locale = korean ? "kr" : "en";
   const copy = mainCopy[locale];
 
   welcomeLine.className = "welcome-line";
+  welcomePrefix.className = "welcome-prefix";
+  welcomeName.className = "welcome-name";
   journeyLine.className = "journey-line";
-  welcomeLine.textContent = copy.welcome(guestName);
   journeyLine.textContent = copy.journey;
+
+  if (locale === "kr") {
+    welcomeName.textContent = `${guestName}님,`;
+    welcomePrefix.textContent = "환영합니다.";
+    welcomeLine.replaceChildren(welcomeName, document.createTextNode(" "), welcomePrefix);
+  } else {
+    welcomePrefix.textContent = "Welcome,";
+    welcomeName.textContent = `${guestName}.`;
+    welcomeLine.replaceChildren(welcomePrefix, document.createTextNode(" "), welcomeName);
+  }
 
   heroTitle.replaceChildren(
     welcomeLine,
