@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Interactive UTKCC Freshman Seminar 2026 in-flight screen invitation."
+    />
+    <title>UTKCC Freshman Seminar 2026</title>
+    <link rel="icon" href="favicon.ico" />
+    <link rel="preload" href="images/screen.png" as="image" />
+    <link rel="preload" href="images/wallpaper.png" as="image" />
+    <link rel="preload" href="images/utkcc-logo.png" as="image" />
+    <link rel="preload" href="images/boarding-pass.png" as="image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Montserrat:wght@500;600;700;800;900&family=Noto+Sans+KR:wght@500;600;700;800;900&family=Poppins:wght@500;600;700;800&family=Playfair+Display:wght@700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="intro-active">
+    <main class="app" aria-labelledby="page-title">
+      <section class="device" aria-label="Airplane in-flight screen">
+        <div class="display">
+          <div class="wallpaper" aria-hidden="true"></div>
+          <div class="screen-shade" aria-hidden="true"></div>
+
+          <section class="intro-panel" aria-labelledby="intro-title">
+            <form class="name-card" data-name-form>
+              <p data-intro-kicker>UTKCC FRESHMAN SEMINAR 2026</p>
+              <h2 id="intro-title" data-intro-title>Passenger Name</h2>
+              <div class="intro-flight-meta" aria-label="Flight information">
+                <span>SEOUL</span>
+                <i aria-hidden="true">✈</i>
+                <span>TORONTO</span>
+                <strong>JUL 11 · 15:00 KST</strong>
+              </div>
+              <label>
+                <span data-intro-label>Your boarding name</span>
+                <input
+                  type="text"
+                  name="guestName"
+                  autocomplete="given-name"
+                  placeholder="Your Name"
+                  maxlength="28"
+                  data-name-input
+                  aria-describedby="name-error"
+                />
+              </label>
+              <p class="form-error" id="name-error" data-name-error aria-live="polite">
+                Please enter your passenger name.
+              </p>
+              <button type="submit" data-intro-button>Begin Journey</button>
+            </form>
+          </section>
+
+          <header class="topbar">
+            <a class="brand" href="#" aria-label="UTKCC home">
+              <img src="images/utkcc-logo.png" alt="" />
+              <span>UTKCC</span>
+            </a>
+            <div class="flight-name">
+              <span></span>
+              <strong>FRESHMAN SEMINAR 2026</strong>
+              <i aria-hidden="true">✈</i>
+            </div>
+            <div class="arrival-countdown" aria-label="Time before arrival">
+              <span data-countdown-label>Arriving in · KST</span>
+              <strong data-arrival-countdown>--d --h --m --s</strong>
+            </div>
+            <button class="pill-button" type="button" data-language aria-label="Change language">
+              <span data-language-label>EN</span>
+              <ion-icon name="globe-outline" aria-hidden="true"></ion-icon>
+            </button>
+          </header>
+
+          <section class="hero">
+            <div class="hero-copy">
+              <p data-route-line>From Seoul <span aria-hidden="true">✈</span> To Toronto</p>
+              <h1 id="page-title" data-hero-title>
+                Welcome Aboard.<br />Your journey starts here.
+              </h1>
+            </div>
+          </section>
+
+          <section class="panel-stage" data-content-panel="event" aria-label="Event information">
+            <div class="panel-heading">
+              <span aria-hidden="true"></span>
+              <h2 data-panel-heading="event">Event at a glance</h2>
+              <span aria-hidden="true"></span>
+            </div>
+            <div class="event-grid">
+              <article class="event-tile">
+                <ion-icon name="calendar-clear-outline" aria-hidden="true"></ion-icon>
+                <p>대관일정</p>
+                <strong>2026. 7. 11. (토)</strong>
+                <span>15:00 - 18:00</span>
+                <small>KST · 총 3시간</small>
+              </article>
+              <article class="event-tile">
+                <ion-icon name="location-outline" aria-hidden="true"></ion-icon>
+                <p>대관장소</p>
+                <strong>백양관 S208호</strong>
+                <span>연세대학교</span>
+              </article>
+            </div>
+          </section>
+
+          <section class="panel-stage" data-content-panel="contact" aria-label="Contact information">
+            <div class="panel-heading">
+              <span aria-hidden="true"></span>
+              <h2 data-panel-heading="contact">Contact us</h2>
+              <span aria-hidden="true"></span>
+            </div>
+            <div class="event-grid contact-grid">
+              <article class="event-tile contact-tile">
+                <ion-icon name="mail-outline" aria-hidden="true"></ion-icon>
+                <p>Email</p>
+                <strong>korean.commerce@gmail.com</strong>
+                <span>UTKCC Freshman Seminar</span>
+              </article>
+              <article class="event-tile contact-tile">
+                <ion-icon name="call-outline" aria-hidden="true"></ion-icon>
+                <p>Phone</p>
+                <strong>010-1234-5678</strong>
+                <span>KST contact number</span>
+              </article>
+            </div>
+          </section>
+
+          <section class="panel-stage checkin-stage" data-content-panel="checkin" aria-label="Check-in boarding pass">
+            <img src="images/boarding-pass.png" alt="UTKCC boarding pass" />
+          </section>
+
+          <nav class="card-dock" aria-label="Invitation menu">
+            <button class="menu-card" type="button" data-panel="event">
+              <ion-icon name="ticket-outline" aria-hidden="true"></ion-icon>
+              <strong data-card-title>Event Info</strong>
+              <small data-card-subtitle>View event details</small>
+            </button>
+            <button class="menu-card" type="button" data-panel="program">
+              <ion-icon name="time-outline" aria-hidden="true"></ion-icon>
+              <strong data-card-title>Program</strong>
+              <small data-card-subtitle>See the timeline</small>
+            </button>
+            <button class="menu-card" type="button" data-panel="checkin">
+              <ion-icon name="scan-outline" aria-hidden="true"></ion-icon>
+              <strong data-card-title>Check-In</strong>
+              <small data-card-subtitle>Scan QR code</small>
+            </button>
+            <button class="menu-card" type="button" data-panel="faq">
+              <ion-icon name="document-text-outline" aria-hidden="true"></ion-icon>
+              <strong data-card-title>FAQ</strong>
+              <small data-card-subtitle>Find answers</small>
+            </button>
+            <button class="menu-card" type="button" data-panel="contact">
+              <ion-icon name="mail-outline" aria-hidden="true"></ion-icon>
+              <strong data-card-title>Contact</strong>
+              <small data-card-subtitle>Get in touch</small>
+            </button>
+          </nav>
+
+          <footer class="controls" aria-label="Screen controls">
+            <div class="control-group control-group-left">
+              <button class="control is-active" type="button" data-nav="home" aria-label="Home">
+                <ion-icon name="home-outline" aria-hidden="true"></ion-icon>
+              </button>
+              <button class="control" type="button" data-sound aria-label="Toggle sound">
+                <ion-icon name="volume-medium-outline" aria-hidden="true"></ion-icon>
+              </button>
+            </div>
+            <div class="live">
+              <small data-live-label>Live attendees</small>
+              <strong><span data-live-count>0</span><i></i></strong>
+            </div>
+            <div class="weather" aria-label="Weather in Toronto">
+              <small data-weather-title>Weather in Toronto</small>
+              <strong>
+                <ion-icon name="partly-sunny-outline" data-weather-icon aria-hidden="true"></ion-icon>
+                <span data-weather-temp>--°C</span>
+                <em data-weather-label>Loading</em>
+              </strong>
+            </div>
+          </footer>
+        </div>
+      </section>
+    </main>
+
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@7.4.0/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@7.4.0/dist/ionicons/ionicons.js"
+    ></script>
+    <script src="script.js"></script>
+  </body>
+</html>
