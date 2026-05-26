@@ -146,6 +146,7 @@ const mainCopy = {
 const weatherLocations = [
   {
     title: { en: "Weather in Toronto", kr: "토론토 날씨" },
+    city: { en: "Toronto", kr: "토론토" },
     fallbackLabel: { en: "Partly Cloudy", kr: "구름 조금" },
     fallbackTemp: "23°C",
     endpoint:
@@ -153,6 +154,7 @@ const weatherLocations = [
   },
   {
     title: { en: "Weather in Seoul", kr: "서울 날씨" },
+    city: { en: "Seoul", kr: "서울" },
     fallbackLabel: { en: "Partly Cloudy", kr: "구름 조금" },
     fallbackTemp: "24°C",
     endpoint:
@@ -476,8 +478,9 @@ function renderWeatherLabel() {
   const location = weatherLocations[activeWeatherIndex];
   const locale = korean ? "kr" : "en";
   const weather = location.current;
+  const compactWeatherTitle = window.matchMedia("(max-width: 700px)").matches;
 
-  weatherTitle.textContent = location.title[locale];
+  weatherTitle.textContent = compactWeatherTitle ? location.city[locale] : location.title[locale];
 
   if (!weather) {
     weatherIcon.setAttribute("name", "partly-sunny-outline");
@@ -569,3 +572,4 @@ function rotateWeather() {
 updateWeather();
 window.setInterval(rotateWeather, 5000);
 window.setInterval(updateWeather, 600000);
+window.addEventListener("resize", renderWeatherLabel);
