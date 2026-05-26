@@ -1300,7 +1300,7 @@ a {
 
   .display::before {
     top: 52%;
-    bottom: 10.5%;
+    bottom: 7.2%;
     backdrop-filter: blur(7px);
   }
 
@@ -1312,7 +1312,7 @@ a {
 
   .screen-shade {
     background:
-      linear-gradient(180deg, rgba(3, 10, 22, 0.22), rgba(4, 14, 31, 0.02) 44%, rgba(4, 14, 31, 0.2) 58%, rgba(255, 255, 255, 0.04) 74%, rgba(4, 14, 31, 0.9) 88%),
+      linear-gradient(180deg, rgba(3, 10, 22, 0.22), rgba(4, 14, 31, 0.02) 44%, rgba(4, 14, 31, 0.2) 58%, rgba(255, 255, 255, 0.04) 77%, rgba(4, 14, 31, 0.9) 92%),
       linear-gradient(90deg, rgba(2, 8, 23, 0.28), rgba(2, 8, 23, 0.02) 52%, rgba(2, 8, 23, 0.08));
   }
 
@@ -1570,21 +1570,21 @@ a {
   .controls {
     left: 0.85rem;
     right: 0.85rem;
-    bottom: max(0.34rem, env(safe-area-inset-bottom));
-    height: 2.15rem;
+    bottom: max(0.28rem, env(safe-area-inset-bottom));
+    height: 2.02rem;
     grid-template-columns: auto auto auto;
     column-gap: 0.7rem;
     justify-content: space-between;
   }
 
   .control {
-    width: 1.7rem;
-    height: 1.7rem;
+    width: 1.68rem;
+    height: 1.68rem;
   }
 
   .control ion-icon {
-    width: 1.05rem;
-    height: 1.05rem;
+    width: 1.04rem;
+    height: 1.04rem;
   }
 
   [data-sound] ion-icon {
@@ -1605,7 +1605,7 @@ a {
   }
 
   .live strong {
-    font-size: 0.78rem;
+    font-size: 0.84rem;
   }
 
   .weather {
@@ -1614,12 +1614,12 @@ a {
 
   .weather strong {
     gap: 0.24rem;
-    font-size: 0.76rem;
+    font-size: 0.82rem;
   }
 
   .weather ion-icon {
-    width: 0.82rem;
-    height: 0.82rem;
+    width: 0.9rem;
+    height: 0.9rem;
   }
 
   .weather em {
