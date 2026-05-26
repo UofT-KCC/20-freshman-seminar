@@ -40,7 +40,7 @@ const panels = {
     title: "Questions before takeoff?",
     body:
       "Reach out to UTKCC for event updates, accessibility questions, or freshman seminar details.",
-    details: ["Email · korean.commerce@gmail.com", "Phone · 010-1234-5678", "Team · UTKCC Execs"],
+    details: ["Website · utkcc.org", "Instagram · @utkcc_", "Team · UTKCC Execs"],
     strip: "Contact channel open",
     seat: "CONTACT",
   },
@@ -66,23 +66,29 @@ const nameError = document.querySelector("[data-name-error]");
 const introKicker = document.querySelector("[data-intro-kicker]");
 const introTitle = document.querySelector("[data-intro-title]");
 const introLabel = document.querySelector("[data-intro-label]");
+const introFlightTime = document.querySelector("[data-intro-flight-time]");
 const introButton = document.querySelector("[data-intro-button]");
 const heroTitle = document.querySelector("[data-hero-title]");
 const routeLine = document.querySelector("[data-route-line]");
 
+const SESSION_STATE_KEY = "utkccFreshmanSeminarState";
+const savedState = readSavedState();
 let count = 0;
-let korean = false;
-let guestName = "Your Name";
+let korean = savedState.korean;
+let guestName = savedState.guestName;
+let introComplete = savedState.introComplete;
+let activePanel = savedState.activePanel;
 let languageUpdateTimer;
 let languageDoneTimer;
-let latestWeatherCode;
-const ARRIVAL_TIME = new Date("2026-07-11T15:00:00+09:00").getTime();
+let activeWeatherIndex = 0;
+const ARRIVAL_TIME = new Date("2026-07-11T18:00:00+09:00").getTime();
 const introCopy = {
   en: {
     language: "EN",
     kicker: "UTKCC FRESHMAN SEMINAR 2026",
     title: "Passenger Name",
     label: "Your boarding name",
+    flightTime: "JUL 11 · DEP 15:00 · ARR 18:00 KST",
     placeholder: "Your Name",
     button: "Begin Journey",
     error: "Please enter your passenger name.",
@@ -90,8 +96,9 @@ const introCopy = {
   kr: {
     language: "KR",
     kicker: "UTKCC 신입생 세미나 2026",
-    title: "탑승객 이름",
-    label: "탑승 이름",
+    title: "환영합니다",
+    label: "탑승객 이름",
+    flightTime: "7월 11일 · 출발 15:00 · 도착 18:00 KST",
     placeholder: "이름",
     button: "여정 시작하기",
     error: "탑승객 이름을 입력해 주세요.",
@@ -104,8 +111,6 @@ const mainCopy = {
     welcome: (name) => `Welcome, ${name}.`,
     journey: "Your journey starts here.",
     live: "Live attendees",
-    weather: "Weather in Toronto",
-    weatherFallback: "Toronto",
     cards: {
       event: ["Event Info", "View event details"],
       program: ["Program", "See the timeline"],
@@ -124,8 +129,6 @@ const mainCopy = {
     welcome: (name) => `${name}님, 환영합니다.`,
     journey: "여정이 곧 시작됩니다.",
     live: "실시간 탑승객",
-    weather: "토론토 날씨",
-    weatherFallback: "토론토",
     cards: {
       event: ["행사 정보", "일정과 장소 보기"],
       program: ["프로그램", "타임라인 보기"],
@@ -140,7 +143,70 @@ const mainCopy = {
   },
 };
 
+const weatherLocations = [
+  {
+    title: { en: "Weather in Toronto", kr: "토론토 날씨" },
+    fallbackLabel: { en: "Partly Cloudy", kr: "구름 조금" },
+    fallbackTemp: "23°C",
+    endpoint:
+      "https://api.open-meteo.com/v1/forecast?latitude=43.6532&longitude=-79.3832&current=temperature_2m,weather_code&timezone=America%2FToronto",
+  },
+  {
+    title: { en: "Weather in Seoul", kr: "서울 날씨" },
+    fallbackLabel: { en: "Partly Cloudy", kr: "구름 조금" },
+    fallbackTemp: "24°C",
+    endpoint:
+      "https://api.open-meteo.com/v1/forecast?latitude=37.5665&longitude=126.9780&current=temperature_2m,weather_code&timezone=Asia%2FSeoul",
+  },
+];
+
 liveCount.textContent = count;
+
+function readSavedState() {
+  let parsed = window.history.state?.utkccFreshmanSeminarState || null;
+
+  try {
+    parsed = JSON.parse(window.sessionStorage.getItem(SESSION_STATE_KEY)) || parsed;
+  } catch (error) {
+    // Fall back to history state when storage is unavailable.
+  }
+
+  const savedPanel = panels[parsed?.activePanel] ? parsed.activePanel : null;
+  const savedName = typeof parsed?.guestName === "string" && parsed.guestName.trim()
+    ? parsed.guestName.trim()
+    : "Your Name";
+
+  return {
+    korean: parsed?.korean === true,
+    guestName: savedName,
+    introComplete: parsed?.introComplete === true,
+    activePanel: savedPanel,
+  };
+}
+
+function persistState() {
+  const state = {
+    korean,
+    guestName,
+    introComplete,
+    activePanel,
+  };
+
+  window.history.replaceState(
+    {
+      ...window.history.state,
+      utkccFreshmanSeminarState: state,
+    },
+    "",
+    window.location.href
+  );
+
+  try {
+    window.sessionStorage.setItem(SESSION_STATE_KEY, JSON.stringify(state));
+  } catch (error) {
+    // The page should keep working even if storage is blocked.
+  }
+}
 
 function formatArrivalCountdown(milliseconds) {
   if (milliseconds <= 0) {
@@ -164,7 +230,9 @@ updateArrivalCountdown();
 window.setInterval(updateArrivalCountdown, 1000);
 
 window.setTimeout(() => {
-  nameInput.focus();
+  if (document.body.classList.contains("intro-active")) {
+    nameInput.focus();
+  }
 }, 1180);
 
 function restartViewAnimation(className) {
@@ -223,7 +291,6 @@ function applyMainLanguage(locale) {
 
   countdownLabel.textContent = copy.countdown;
   liveLabel.textContent = copy.live;
-  weatherTitle.textContent = copy.weather;
 
   cards.forEach((card) => {
     const cardCopy = copy.cards[card.dataset.panel];
@@ -253,23 +320,26 @@ function setHomeView() {
   document.body.classList.remove("panel-view");
   cards.forEach((card) => card.classList.remove("is-active"));
   contentPanels.forEach((contentPanel) => contentPanel.classList.remove("is-active"));
+  activePanel = null;
 
   setRouteLine();
   setWelcomeTitle();
   restartViewAnimation("home-enter");
+  persistState();
 }
 
 function setPanel(key) {
-  const panel = panels[key] || panels.event;
+  activePanel = panels[key] ? key : "event";
 
   cards.forEach((card) => {
-    card.classList.toggle("is-active", card.dataset.panel === key);
+    card.classList.toggle("is-active", card.dataset.panel === activePanel);
   });
 
   contentPanels.forEach((contentPanel) => {
-    contentPanel.classList.toggle("is-active", contentPanel.dataset.contentPanel === key);
+    contentPanel.classList.toggle("is-active", contentPanel.dataset.contentPanel === activePanel);
   });
 
+  persistState();
 }
 
 cards.forEach((card) => {
@@ -304,6 +374,7 @@ function applyIntroLanguage(locale) {
   introKicker.textContent = copy.kicker;
   introTitle.textContent = copy.title;
   introLabel.textContent = copy.label;
+  introFlightTime.textContent = copy.flightTime;
   introButton.textContent = copy.button;
   nameError.textContent = copy.error;
   nameInput.placeholder = copy.placeholder;
@@ -326,6 +397,7 @@ function clearNameError() {
 languageButton.addEventListener("click", () => {
   korean = !korean;
   const locale = korean ? "kr" : "en";
+  persistState();
 
   window.clearTimeout(languageUpdateTimer);
   window.clearTimeout(languageDoneTimer);
@@ -336,6 +408,7 @@ languageButton.addEventListener("click", () => {
 
   languageUpdateTimer = window.setTimeout(() => {
     applyIntroLanguage(locale);
+    persistState();
   }, 120);
 
   languageDoneTimer = window.setTimeout(() => {
@@ -357,6 +430,8 @@ nameForm.addEventListener("submit", (event) => {
 
   clearNameError();
   guestName = submittedName;
+  introComplete = true;
+  persistState();
   setWelcomeTitle();
 
   document.body.classList.add("intro-exiting");
@@ -398,19 +473,57 @@ const weatherCodes = {
 };
 
 function renderWeatherLabel() {
-  const [, englishLabel, koreanLabel] =
-    weatherCodes[latestWeatherCode] || ["partly-sunny-outline", "Toronto", "토론토"];
+  const location = weatherLocations[activeWeatherIndex];
+  const locale = korean ? "kr" : "en";
+  const weather = location.current;
 
+  weatherTitle.textContent = location.title[locale];
+
+  if (!weather) {
+    weatherIcon.setAttribute("name", "partly-sunny-outline");
+    weatherTemp.textContent = location.fallbackTemp;
+    weatherLabel.textContent = location.fallbackLabel[locale];
+    return;
+  }
+
+  const [, englishLabel, koreanLabel] =
+    weatherCodes[weather.code] || [
+      "partly-sunny-outline",
+      location.fallbackLabel.en,
+      location.fallbackLabel.kr,
+    ];
+
+  weatherIcon.setAttribute("name", weather.icon);
+  weatherTemp.textContent = `${Math.round(weather.temperature)}°C`;
   weatherLabel.textContent = korean ? koreanLabel : englishLabel;
 }
 
-applyMainLanguage("en");
+function restoreSavedView() {
+  applyIntroLanguage(korean ? "kr" : "en");
+  languageButton.setAttribute("aria-pressed", String(korean));
+  nameInput.value = guestName === "Your Name" ? "" : guestName;
 
-async function updateTorontoWeather() {
+  if (!introComplete) {
+    return;
+  }
+
+  document.body.classList.remove("intro-active", "intro-exiting");
+  document.body.classList.add("intro-complete");
+
+  if (activePanel) {
+    document.body.classList.add("panel-view");
+    setPanel(activePanel);
+  } else {
+    setHomeView();
+    document.body.classList.remove("home-enter");
+  }
+}
+
+restoreSavedView();
+
+async function fetchLocationWeather(location) {
   try {
-    const endpoint =
-      "https://api.open-meteo.com/v1/forecast?latitude=43.6532&longitude=-79.3832&current=temperature_2m,weather_code&timezone=America%2FToronto";
-    const response = await fetch(endpoint);
+    const response = await fetch(location.endpoint);
 
     if (!response.ok) {
       throw new Error("Weather request failed");
@@ -418,19 +531,41 @@ async function updateTorontoWeather() {
 
     const data = await response.json();
     const current = data.current;
-    latestWeatherCode = current.weather_code;
     const [icon] =
-      weatherCodes[current.weather_code] || ["partly-sunny-outline", "Toronto", "토론토"];
+      weatherCodes[current.weather_code] || [
+        "partly-sunny-outline",
+        location.fallbackLabel.en,
+        location.fallbackLabel.kr,
+      ];
 
-    weatherIcon.setAttribute("name", icon);
-    weatherTemp.textContent = `${Math.round(current.temperature_2m)}°C`;
-    renderWeatherLabel();
+    location.current = {
+      code: current.weather_code,
+      icon,
+      temperature: current.temperature_2m,
+    };
   } catch (error) {
-    latestWeatherCode = undefined;
-    weatherIcon.setAttribute("name", "partly-sunny-outline");
-    weatherTemp.textContent = "23°C";
-    renderWeatherLabel();
+    location.current = undefined;
   }
 }
 
-updateTorontoWeather();
+async function updateWeather() {
+  await Promise.all(weatherLocations.map(fetchLocationWeather));
+  renderWeatherLabel();
+}
+
+function rotateWeather() {
+  const weather = weatherTitle.closest(".weather");
+
+  weather.classList.add("is-weather-swapping");
+  window.setTimeout(() => {
+    activeWeatherIndex = (activeWeatherIndex + 1) % weatherLocations.length;
+    renderWeatherLabel();
+  }, 140);
+  window.setTimeout(() => {
+    weather.classList.remove("is-weather-swapping");
+  }, 240);
+}
+
+updateWeather();
+window.setInterval(rotateWeather, 5000);
+window.setInterval(updateWeather, 600000);

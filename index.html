@@ -10,6 +10,7 @@
     <title>UTKCC Freshman Seminar 2026</title>
     <link rel="icon" href="favicon.ico" />
     <link rel="preload" href="images/screen.png" as="image" />
+    <link rel="preload" href="images/desktop-screen.png" as="image" />
     <link rel="preload" href="images/wallpaper.png" as="image" />
     <link rel="preload" href="images/utkcc-logo.png" as="image" />
     <link rel="preload" href="images/boarding-pass.png" as="image" />
@@ -36,7 +37,7 @@
                 <span>SEOUL</span>
                 <i aria-hidden="true">✈</i>
                 <span>TORONTO</span>
-                <strong>JUL 11 · 15:00 KST</strong>
+                <strong data-intro-flight-time>JUL 11 · DEP 15:00 · ARR 18:00 KST</strong>
               </div>
               <label>
                 <span data-intro-label>Your boarding name</span>
@@ -100,12 +101,22 @@
                 <span>15:00 - 18:00</span>
                 <small>KST · 총 3시간</small>
               </article>
-              <article class="event-tile">
+              <a
+                class="event-tile event-tile-link"
+                href="https://kko.to/IlnmU2PcdE"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="카카오맵에서 연세대학교 백양관 S208호 오는 길 보기"
+              >
                 <ion-icon name="location-outline" aria-hidden="true"></ion-icon>
                 <p>대관장소</p>
                 <strong>백양관 S208호</strong>
                 <span>연세대학교</span>
-              </article>
+                <small class="event-link-hint">
+                  길찾기
+                  <ion-icon name="open-outline" aria-hidden="true"></ion-icon>
+                </small>
+              </a>
             </div>
           </section>
 
@@ -116,18 +127,36 @@
               <span aria-hidden="true"></span>
             </div>
             <div class="event-grid contact-grid">
-              <article class="event-tile contact-tile">
-                <ion-icon name="mail-outline" aria-hidden="true"></ion-icon>
-                <p>Email</p>
-                <strong>korean.commerce@gmail.com</strong>
-                <span>UTKCC Freshman Seminar</span>
-              </article>
-              <article class="event-tile contact-tile">
-                <ion-icon name="call-outline" aria-hidden="true"></ion-icon>
-                <p>Phone</p>
-                <strong>010-1234-5678</strong>
-                <span>KST contact number</span>
-              </article>
+              <a
+                class="event-tile event-tile-link contact-tile"
+                href="https://www.utkcc.org/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="UTKCC 공식 웹사이트 열기"
+              >
+                <ion-icon name="globe-outline" aria-hidden="true"></ion-icon>
+                <p>KCC Official Website</p>
+                <strong>utkcc.org</strong>
+                <small class="event-link-hint">
+                  방문하기
+                  <ion-icon name="open-outline" aria-hidden="true"></ion-icon>
+                </small>
+              </a>
+              <a
+                class="event-tile event-tile-link contact-tile"
+                href="https://www.instagram.com/utkcc_/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="UTKCC Instagram 열기"
+              >
+                <ion-icon name="logo-instagram" aria-hidden="true"></ion-icon>
+                <p>KCC Instagram</p>
+                <strong>@utkcc_</strong>
+                <small class="event-link-hint">
+                  Instagram
+                  <ion-icon name="open-outline" aria-hidden="true"></ion-icon>
+                </small>
+              </a>
             </div>
           </section>
 
@@ -176,7 +205,7 @@
               <small data-live-label>Live attendees</small>
               <strong><span data-live-count>0</span><i></i></strong>
             </div>
-            <div class="weather" aria-label="Weather in Toronto">
+            <div class="weather" aria-label="Weather">
               <small data-weather-title>Weather in Toronto</small>
               <strong>
                 <ion-icon name="partly-sunny-outline" data-weather-icon aria-hidden="true"></ion-icon>
