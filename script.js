@@ -70,6 +70,7 @@ const introFlightTime = document.querySelector("[data-intro-flight-time]");
 const introButton = document.querySelector("[data-intro-button]");
 const heroTitle = document.querySelector("[data-hero-title]");
 const routeLine = document.querySelector("[data-route-line]");
+const eventDetailItems = document.querySelectorAll("[data-event-detail]");
 
 const SESSION_STATE_KEY = "utkccFreshmanSeminarState";
 const savedState = readSavedState();
@@ -86,7 +87,7 @@ const introCopy = {
   en: {
     language: "EN",
     kicker: "UTKCC FRESHMAN SEMINAR 2026",
-    title: "Passenger Name",
+    title: "Welcome Onboard",
     label: "Your boarding name",
     flightTime: "JUL 11 · DEP 15:00 · ARR 18:00 KST",
     placeholder: "Your Name",
@@ -122,6 +123,20 @@ const mainCopy = {
       event: "Event at a glance",
       contact: "Contact us",
     },
+    eventDetails: {
+      dateLabel: "Seminar Date",
+      dateValue: "July 11, 2026 (Sat)",
+      timeValue: "3:00 PM - 6:00 PM",
+      timeNote: "KST · 3 hours",
+      locationLabel: "Seminar Location",
+      locationValue: "Baekyang Hall S208",
+      locationNote: "Yonsei University",
+      directionsLabel: "Directions",
+      // afterpartyLabel: "Afterparty Location",
+      // afterpartyValue: "TBD",
+      // afterpartyNote: "Announced soon",
+      // afterpartyDirectionsLabel: "Map TBD",
+    },
   },
   kr: {
     countdown: "도착까지 · KST",
@@ -139,6 +154,20 @@ const mainCopy = {
     headings: {
       event: "행사 한눈에 보기",
       contact: "문의하기",
+    },
+    eventDetails: {
+      dateLabel: "세미나 일정",
+      dateValue: "2026. 7. 11. (토)",
+      timeValue: "15:00 - 18:00",
+      timeNote: "KST · 총 3시간",
+      locationLabel: "세미나 장소",
+      locationValue: "백양관 S208호",
+      locationNote: "연세대학교",
+      directionsLabel: "길찾기",
+      // afterpartyLabel: "2차 장소",
+      // afterpartyValue: "장소 미정",
+      // afterpartyNote: "추후 공지",
+      // afterpartyDirectionsLabel: "길찾기 준비중",
     },
   },
 };
@@ -310,6 +339,14 @@ function applyMainLanguage(locale) {
 
     if (headingCopy) {
       heading.textContent = headingCopy;
+    }
+  });
+
+  eventDetailItems.forEach((item) => {
+    const detailCopy = copy.eventDetails[item.dataset.eventDetail];
+
+    if (detailCopy) {
+      item.textContent = detailCopy;
     }
   });
 

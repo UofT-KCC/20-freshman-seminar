@@ -32,7 +32,7 @@
           <section class="intro-panel" aria-labelledby="intro-title">
             <form class="name-card" data-name-form>
               <p data-intro-kicker>UTKCC FRESHMAN SEMINAR 2026</p>
-              <h2 id="intro-title" data-intro-title>Passenger Name</h2>
+              <h2 id="intro-title" data-intro-title>Welcome Onboard</h2>
               <div class="intro-flight-meta" aria-label="Flight information">
                 <span>SEOUL</span>
                 <i aria-hidden="true">✈</i>
@@ -96,10 +96,10 @@
             <div class="event-grid">
               <article class="event-tile">
                 <ion-icon name="calendar-clear-outline" aria-hidden="true"></ion-icon>
-                <p>대관일정</p>
-                <strong>2026. 7. 11. (토)</strong>
-                <span>15:00 - 18:00</span>
-                <small>KST · 총 3시간</small>
+                <p data-event-detail="dateLabel">Seminar Date</p>
+                <strong data-event-detail="dateValue">July 11, 2026 (Sat)</strong>
+                <span data-event-detail="timeValue">3:00 PM - 6:00 PM</span>
+                <small data-event-detail="timeNote">KST · 3 hours</small>
               </article>
               <a
                 class="event-tile event-tile-link"
@@ -109,14 +109,34 @@
                 aria-label="카카오맵에서 연세대학교 백양관 S208호 오는 길 보기"
               >
                 <ion-icon name="location-outline" aria-hidden="true"></ion-icon>
-                <p>대관장소</p>
-                <strong>백양관 S208호</strong>
-                <span>연세대학교</span>
+                <p data-event-detail="locationLabel">Seminar Location</p>
+                <strong data-event-detail="locationValue">Baekyang Hall S208</strong>
+                <span data-event-detail="locationNote">Yonsei University</span>
                 <small class="event-link-hint">
-                  길찾기
+                  <span data-event-detail="directionsLabel">Directions</span>
                   <ion-icon name="open-outline" aria-hidden="true"></ion-icon>
                 </small>
               </a>
+              <!--
+                Afterparty location placeholder. Uncomment when the second location
+                is confirmed, then update the href and eventDetails copy in script.js.
+                <a
+                  class="event-tile event-tile-link"
+                  href="https://map.kakao.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="2차 장소 지도 링크 샘플"
+                >
+                  <ion-icon name="wine-outline" aria-hidden="true"></ion-icon>
+                  <p data-event-detail="afterpartyLabel">Afterparty Location</p>
+                  <strong data-event-detail="afterpartyValue">TBD</strong>
+                  <span data-event-detail="afterpartyNote">Announced soon</span>
+                  <small class="event-link-hint">
+                    <span data-event-detail="afterpartyDirectionsLabel">Map TBD</span>
+                    <ion-icon name="open-outline" aria-hidden="true"></ion-icon>
+                  </small>
+                </a>
+              -->
             </div>
           </section>
 
