@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="UTKCC Freshman Seminar 2026 staff QR check-in scanner."
+    />
+    <title>UTKCC Staff Scanner</title>
+    <link rel="icon" href="favicon.ico" />
+    <link rel="preload" href="images/utkcc-logo.png" as="image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Montserrat:wght@500;600;700;800;900&family=Noto+Sans+KR:wght@500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="scanner-page">
+    <main class="scanner-app" aria-labelledby="scanner-title">
+      <header class="scanner-header">
+        <a class="scanner-brand" href="index.html" aria-label="UTKCC home">
+          <img src="images/utkcc-logo.png" alt="" />
+          <span>UTKCC</span>
+        </a>
+        <div>
+          <p>Freshman Seminar 2026</p>
+          <strong>Staff Check-In</strong>
+        </div>
+      </header>
+
+      <section class="staff-scanner-card">
+        <div class="staff-scanner-preview">
+          <video data-qr-video playsinline muted></video>
+          <div class="staff-scanner-frame" aria-hidden="true"></div>
+          <span class="staff-scanner-badge" data-scanner-state>Ready</span>
+        </div>
+
+        <div class="staff-scanner-panel">
+          <p>임원 전용</p>
+          <h1 id="scanner-title">QR 체크인 스캐너</h1>
+          <span data-scanner-status>시작을 누르고 카메라 접근을 허용해 주세요.</span>
+          <output class="staff-scanner-result" data-scanner-result hidden></output>
+
+          <div class="staff-scanner-actions">
+            <button type="button" data-qr-start>
+              <ion-icon name="scan-outline" aria-hidden="true"></ion-icon>
+              스캐너 시작
+            </button>
+            <button type="button" data-qr-stop disabled>
+              <ion-icon name="stop-circle-outline" aria-hidden="true"></ion-icon>
+              중지
+            </button>
+          </div>
+
+          <a class="staff-scanner-link" href="index.html">
+            참석자 페이지로 돌아가기
+            <ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@7.4.0/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@7.4.0/dist/ionicons/ionicons.js"
+    ></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <script src="scanner.js"></script>
+  </body>
+</html>

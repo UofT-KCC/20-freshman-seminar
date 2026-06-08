@@ -54,6 +54,8 @@ const liveCount = document.querySelector("[data-live-count]");
 const liveLabel = document.querySelector("[data-live-label]");
 const languageButton = document.querySelector("[data-language]");
 const languageLabel = document.querySelector("[data-language-label]");
+const themeButton = document.querySelector("[data-theme]");
+const themeIcon = themeButton.querySelector("ion-icon");
 const weatherIcon = document.querySelector("[data-weather-icon]");
 const weatherTitle = document.querySelector("[data-weather-title]");
 const weatherTemp = document.querySelector("[data-weather-temp]");
@@ -71,6 +73,7 @@ const introButton = document.querySelector("[data-intro-button]");
 const heroTitle = document.querySelector("[data-hero-title]");
 const routeLine = document.querySelector("[data-route-line]");
 const eventDetailItems = document.querySelectorAll("[data-event-detail]");
+const checkinCopyItems = document.querySelectorAll("[data-checkin-copy]");
 
 const SESSION_STATE_KEY = "utkccFreshmanSeminarState";
 const savedState = readSavedState();
@@ -79,6 +82,7 @@ let korean = savedState.korean;
 let guestName = savedState.guestName;
 let introComplete = savedState.introComplete;
 let activePanel = savedState.activePanel;
+let screenDimmed = savedState.screenDimmed;
 let languageUpdateTimer;
 let languageDoneTimer;
 let activeWeatherIndex = 0;
@@ -115,7 +119,7 @@ const mainCopy = {
     cards: {
       event: ["Event Info", "View event details"],
       program: ["Program", "See the timeline"],
-      checkin: ["Check-In", "Scan QR code"],
+      checkin: ["Check-In", "Check at the desk"],
       faq: ["FAQ", "Find answers"],
       contact: ["Contact", "Get in touch"],
     },
@@ -132,10 +136,15 @@ const mainCopy = {
       locationValue: "Baekyang Hall S208",
       locationNote: "Yonsei University",
       directionsLabel: "Directions",
-      // afterpartyLabel: "Afterparty Location",
-      // afterpartyValue: "TBD",
-      // afterpartyNote: "Announced soon",
-      // afterpartyDirectionsLabel: "Map TBD",
+      afterpartyLabel: "Afterparty Location",
+      afterpartyValue: "TBD",
+      afterpartyNote: "Announced soon",
+      afterpartyDirectionsLabel: "Map TBD",
+    },
+    checkin: {
+      eyebrow: "Event Desk Check-In",
+      title: "Please check in at the desk",
+      body: "When you arrive, show your name or QR code to the UTKCC staff at the front desk.",
     },
   },
   kr: {
@@ -147,7 +156,7 @@ const mainCopy = {
     cards: {
       event: ["행사 정보", "일정과 장소 보기"],
       program: ["프로그램", "타임라인 보기"],
-      checkin: ["체크인", "QR 코드 확인"],
+      checkin: ["체크인", "데스크에서 확인"],
       faq: ["자주 묻는 질문", "답변 확인"],
       contact: ["문의", "연락처 보기"],
     },
@@ -164,10 +173,15 @@ const mainCopy = {
       locationValue: "백양관 S208호",
       locationNote: "연세대학교",
       directionsLabel: "길찾기",
-      // afterpartyLabel: "2차 장소",
-      // afterpartyValue: "장소 미정",
-      // afterpartyNote: "추후 공지",
-      // afterpartyDirectionsLabel: "길찾기 준비중",
+      afterpartyLabel: "2차 장소",
+      afterpartyValue: "장소 미정",
+      afterpartyNote: "추후 공지",
+      afterpartyDirectionsLabel: "길찾기 준비중",
+    },
+    checkin: {
+      eyebrow: "데스크 체크인",
+      title: "데스크에서 확인해 주세요",
+      body: "도착하시면 입구 데스크의 UTKCC 임원에게 이름 또는 QR 코드를 보여 주세요.",
     },
   },
 };
@@ -212,6 +226,7 @@ function readSavedState() {
     guestName: savedName,
     introComplete: parsed?.introComplete === true,
     activePanel: savedPanel,
+    screenDimmed: parsed?.screenDimmed === true,
   };
 }
 
@@ -221,6 +236,7 @@ function persistState() {
     guestName,
     introComplete,
     activePanel,
+    screenDimmed,
   };
 
   window.history.replaceState(
@@ -350,6 +366,14 @@ function applyMainLanguage(locale) {
     }
   });
 
+  checkinCopyItems.forEach((item) => {
+    const checkinCopy = copy.checkin[item.dataset.checkinCopy];
+
+    if (checkinCopy) {
+      item.textContent = checkinCopy;
+    }
+  });
+
   setRouteLine();
   setWelcomeTitle();
   renderWeatherLabel();
@@ -401,8 +425,16 @@ navButtons.forEach((button) => {
   });
 });
 
-document.querySelector("[data-sound]").addEventListener("click", () => {
-  document.body.classList.toggle("is-muted");
+function applyScreenBrightness() {
+  document.body.classList.toggle("is-screen-dimmed", screenDimmed);
+  themeButton.setAttribute("aria-pressed", String(screenDimmed));
+  themeIcon.setAttribute("name", screenDimmed ? "moon-outline" : "sunny-outline");
+}
+
+themeButton.addEventListener("click", () => {
+  screenDimmed = !screenDimmed;
+  applyScreenBrightness();
+  persistState();
 });
 
 function applyIntroLanguage(locale) {
@@ -540,6 +572,7 @@ function renderWeatherLabel() {
 
 function restoreSavedView() {
   applyIntroLanguage(korean ? "kr" : "en");
+  applyScreenBrightness();
   languageButton.setAttribute("aria-pressed", String(korean));
   nameInput.value = guestName === "Your Name" ? "" : guestName;
 

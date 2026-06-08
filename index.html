@@ -13,7 +13,6 @@
     <link rel="preload" href="images/desktop-screen.png" as="image" />
     <link rel="preload" href="images/wallpaper.png" as="image" />
     <link rel="preload" href="images/utkcc-logo.png" as="image" />
-    <link rel="preload" href="images/boarding-pass.png" as="image" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -93,7 +92,7 @@
               <h2 data-panel-heading="event">Event at a glance</h2>
               <span aria-hidden="true"></span>
             </div>
-            <div class="event-grid">
+            <div class="event-grid event-grid-event">
               <article class="event-tile">
                 <ion-icon name="calendar-clear-outline" aria-hidden="true"></ion-icon>
                 <p data-event-detail="dateLabel">Seminar Date</p>
@@ -117,26 +116,22 @@
                   <ion-icon name="open-outline" aria-hidden="true"></ion-icon>
                 </small>
               </a>
-              <!--
-                Afterparty location placeholder. Uncomment when the second location
-                is confirmed, then update the href and eventDetails copy in script.js.
-                <a
-                  class="event-tile event-tile-link"
-                  href="https://map.kakao.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="2차 장소 지도 링크 샘플"
-                >
-                  <ion-icon name="wine-outline" aria-hidden="true"></ion-icon>
-                  <p data-event-detail="afterpartyLabel">Afterparty Location</p>
-                  <strong data-event-detail="afterpartyValue">TBD</strong>
-                  <span data-event-detail="afterpartyNote">Announced soon</span>
-                  <small class="event-link-hint">
-                    <span data-event-detail="afterpartyDirectionsLabel">Map TBD</span>
-                    <ion-icon name="open-outline" aria-hidden="true"></ion-icon>
-                  </small>
-                </a>
-              -->
+              <a
+                class="event-tile event-tile-link"
+                href="https://map.kakao.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="2차 장소 지도 링크 샘플"
+              >
+                <ion-icon name="wine-outline" aria-hidden="true"></ion-icon>
+                <p data-event-detail="afterpartyLabel">Afterparty Location</p>
+                <strong data-event-detail="afterpartyValue">TBD</strong>
+                <span data-event-detail="afterpartyNote">Announced soon</span>
+                <small class="event-link-hint">
+                  <span data-event-detail="afterpartyDirectionsLabel">Map TBD</span>
+                  <ion-icon name="open-outline" aria-hidden="true"></ion-icon>
+                </small>
+              </a>
             </div>
           </section>
 
@@ -180,8 +175,19 @@
             </div>
           </section>
 
-          <section class="panel-stage checkin-stage" data-content-panel="checkin" aria-label="Check-in boarding pass">
-            <img src="images/boarding-pass.png" alt="UTKCC boarding pass" />
+          <section class="panel-stage checkin-stage" data-content-panel="checkin" aria-label="Check-in information">
+            <div class="checkin-card">
+              <div class="checkin-icon" aria-hidden="true">
+                <ion-icon name="id-card-outline"></ion-icon>
+              </div>
+              <div class="checkin-copy">
+                <p data-checkin-copy="eyebrow">Event Desk Check-In</p>
+                <strong data-checkin-copy="title">Please check in at the desk</strong>
+                <span data-checkin-copy="body">
+                  When you arrive, show your name or QR code to the UTKCC staff at the front desk.
+                </span>
+              </div>
+            </div>
           </section>
 
           <nav class="card-dock" aria-label="Invitation menu">
@@ -196,9 +202,9 @@
               <small data-card-subtitle>See the timeline</small>
             </button>
             <button class="menu-card" type="button" data-panel="checkin">
-              <ion-icon name="scan-outline" aria-hidden="true"></ion-icon>
+              <ion-icon name="id-card-outline" aria-hidden="true"></ion-icon>
               <strong data-card-title>Check-In</strong>
-              <small data-card-subtitle>Scan QR code</small>
+              <small data-card-subtitle>Check at the desk</small>
             </button>
             <button class="menu-card" type="button" data-panel="faq">
               <ion-icon name="document-text-outline" aria-hidden="true"></ion-icon>
@@ -217,8 +223,8 @@
               <button class="control is-active" type="button" data-nav="home" aria-label="Home">
                 <ion-icon name="home-outline" aria-hidden="true"></ion-icon>
               </button>
-              <button class="control" type="button" data-sound aria-label="Toggle sound">
-                <ion-icon name="volume-medium-outline" aria-hidden="true"></ion-icon>
+              <button class="control" type="button" data-theme aria-label="Toggle screen brightness">
+                <ion-icon name="sunny-outline" aria-hidden="true"></ion-icon>
               </button>
             </div>
             <div class="live">
