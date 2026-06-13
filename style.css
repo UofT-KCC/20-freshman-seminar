@@ -794,7 +794,7 @@ a {
 .checkin-copy strong {
   color: #061a3d;
   font-size: clamp(1.06rem, 1.56vw, 1.36rem);
-  font-weight: 760;
+  font-weight: 620;
   line-height: 1.12;
 }
 

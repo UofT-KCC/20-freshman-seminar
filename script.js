@@ -76,8 +76,8 @@ const eventDetailItems = document.querySelectorAll("[data-event-detail]");
 const checkinCopyItems = document.querySelectorAll("[data-checkin-copy]");
 
 const SESSION_STATE_KEY = "utkccFreshmanSeminarState";
+const ATTENDEE_ID_KEY = "utkccFreshmanSeminarAttendeeId";
 const savedState = readSavedState();
-let count = 0;
 let korean = savedState.korean;
 let guestName = savedState.guestName;
 let introComplete = savedState.introComplete;
@@ -205,7 +205,57 @@ const weatherLocations = [
   },
 ];
 
-liveCount.textContent = count;
+liveCount.textContent = "0";
+
+function createAttendeeId() {
+  if (window.crypto?.randomUUID) {
+    return window.crypto.randomUUID();
+  }
+
+  return `${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 14)}`;
+}
+
+function getAttendeeId() {
+  try {
+    const storedId = window.localStorage.getItem(ATTENDEE_ID_KEY);
+
+    if (storedId) {
+      return storedId;
+    }
+
+    const attendeeId = createAttendeeId();
+    window.localStorage.setItem(ATTENDEE_ID_KEY, attendeeId);
+    return attendeeId;
+  } catch (error) {
+    return createAttendeeId();
+  }
+}
+
+async function registerAttendeeVisit() {
+  try {
+    const response = await fetch("/api/attendees", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        visitorId: getAttendeeId(),
+      }),
+    });
+
+    if (!response.ok) {
+      return;
+    }
+
+    const data = await response.json();
+
+    if (Number.isInteger(data.count) && data.count >= 0) {
+      liveCount.textContent = data.count;
+    }
+  } catch (error) {
+    // Keep the static fallback count if the API is not available locally.
+  }
+}
 
 function readSavedState() {
   let parsed = window.history.state?.utkccFreshmanSeminarState || null;
@@ -640,6 +690,7 @@ function rotateWeather() {
 }
 
 updateWeather();
+registerAttendeeVisit();
 window.setInterval(rotateWeather, 5000);
 window.setInterval(updateWeather, 600000);
 window.addEventListener("resize", renderWeatherLabel);
