@@ -250,7 +250,15 @@ function getAttendeeId() {
   }
 }
 
+function showLocalAttendeeFallback() {
+  if (!Number.parseInt(liveCount.textContent, 10)) {
+    liveCount.textContent = "1";
+  }
+}
+
 async function registerAttendeeVisit() {
+  showLocalAttendeeFallback();
+
   try {
     const response = await fetch("/api/attendees", {
       method: "POST",
@@ -264,6 +272,7 @@ async function registerAttendeeVisit() {
 
     if (!response.ok) {
       console.warn("Live attendee counter is unavailable.", await response.json().catch(() => ({})));
+      showLocalAttendeeFallback();
       return;
     }
 
@@ -271,9 +280,15 @@ async function registerAttendeeVisit() {
 
     if (Number.isInteger(data.count) && data.count >= 0) {
       liveCount.textContent = data.count;
+    } else {
+      showLocalAttendeeFallback();
+    }
+
+    if (data.storage === "memory") {
+      console.info("Live attendee counter is using temporary memory storage.");
     }
   } catch (error) {
-    // Keep the static fallback count if the API is not available locally.
+    showLocalAttendeeFallback();
   }
 }
 

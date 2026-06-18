@@ -1,4 +1,7 @@
 const STORE_PATH = "freshman-seminar-2026/attendees.json";
+const memoryVisitors = globalThis.__utkccAttendeeVisitors || new Set();
+
+globalThis.__utkccAttendeeVisitors = memoryVisitors;
 
 function sendJson(response, statusCode, payload) {
   response.statusCode = statusCode;
@@ -66,36 +69,51 @@ module.exports = async function handler(request, response) {
     return;
   }
 
+  const body = getRequestBody(request);
+  const visitorId = body.visitorId;
+
+  if (request.method === "POST" && !isValidVisitorId(visitorId)) {
+    sendJson(response, 400, { error: "Invalid visitor ID" });
+    return;
+  }
+
   try {
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      throw new Error("BLOB_READ_WRITE_TOKEN is not configured.");
+    }
+
     const blobStore = await import("@vercel/blob");
     const visitors = await readAttendees(blobStore);
 
-    if (request.method === "GET") {
+    if (request.method === "POST") {
+      const uniqueVisitors = new Set(visitors);
+      uniqueVisitors.add(visitorId);
+
+      const nextVisitors = Array.from(uniqueVisitors);
+      await writeAttendees(blobStore, nextVisitors);
+
       sendJson(response, 200, {
-        count: visitors.length,
+        count: nextVisitors.length,
+        storage: "blob",
       });
       return;
     }
 
-    const visitorId = getRequestBody(request).visitorId;
-
-    if (!isValidVisitorId(visitorId)) {
-      sendJson(response, 400, { error: "Invalid visitor ID" });
-      return;
-    }
-
-    const uniqueVisitors = new Set(visitors);
-    uniqueVisitors.add(visitorId);
-
-    const nextVisitors = Array.from(uniqueVisitors);
-    await writeAttendees(blobStore, nextVisitors);
-
     sendJson(response, 200, {
-      count: nextVisitors.length,
+      count: visitors.length,
+      storage: "blob",
     });
   } catch (error) {
-    sendJson(response, 500, {
-      error: "Attendee counter storage is not configured.",
+    if (request.method === "POST") {
+      memoryVisitors.add(visitorId);
+    }
+
+    response.setHeader("X-Attendee-Storage", "memory-fallback");
+
+    sendJson(response, 200, {
+      count: memoryVisitors.size,
+      storage: "memory",
+      ok: true,
     });
   }
 };
