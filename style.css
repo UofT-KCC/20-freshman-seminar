@@ -1444,6 +1444,48 @@ a {
   color: rgba(10, 52, 119, 0.62);
 }
 
+.afterparty-tile {
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.72), rgba(239, 246, 255, 0.45));
+}
+
+.event-grid-event .afterparty-tile {
+  row-gap: 0.28rem;
+}
+
+.afterparty-tile ion-icon {
+  background: rgba(10, 79, 179, 0.1);
+}
+
+.afterparty-tags {
+  grid-area: time;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.22rem;
+  max-width: 11.5rem;
+}
+
+.afterparty-tags span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.02rem;
+  padding: 0.18rem 0.38rem;
+  border: 1px solid rgba(10, 52, 119, 0.12);
+  border-radius: 6px;
+  background: rgba(10, 79, 179, 0.055);
+  color: #0a3477;
+  font-size: clamp(0.46rem, 0.66vw, 0.56rem);
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.afterparty-tile small {
+  max-width: 10rem;
+  color: rgba(49, 68, 107, 0.72);
+  line-height: 1.15;
+}
+
 .event-tile .event-link-hint ion-icon {
   width: 0.9em;
   height: 0.9em;
@@ -1493,6 +1535,11 @@ a {
     "icon title"
     "icon note";
   row-gap: 0.12rem;
+}
+
+.contact-tile .event-link-hint {
+  font-size: clamp(0.4rem, 0.56vw, 0.48rem);
+  font-weight: 600;
 }
 
 .card-dock {
@@ -2056,6 +2103,11 @@ a {
     justify-items: start;
     row-gap: 0.16rem;
     text-align: left;
+  }
+
+  .afterparty-tags {
+    justify-content: flex-start;
+    max-width: 100%;
   }
 
   .event-tile {

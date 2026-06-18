@@ -73,6 +73,7 @@ const introButton = document.querySelector("[data-intro-button]");
 const heroTitle = document.querySelector("[data-hero-title]");
 const routeLine = document.querySelector("[data-route-line]");
 const eventDetailItems = document.querySelectorAll("[data-event-detail]");
+const contactDetailItems = document.querySelectorAll("[data-contact-detail]");
 const checkinCopyItems = document.querySelectorAll("[data-checkin-copy]");
 
 const SESSION_STATE_KEY = "utkccFreshmanSeminarState";
@@ -136,10 +137,19 @@ const mainCopy = {
       locationValue: "Baekyang Hall S208",
       locationNote: "Yonsei University",
       directionsLabel: "Directions",
-      afterpartyLabel: "Afterparty Location",
-      afterpartyValue: "TBD",
-      afterpartyNote: "Announced soon",
-      afterpartyDirectionsLabel: "Map TBD",
+      afterpartyLabel: "Afterparty Venue",
+      afterpartyValue: "Hyunmyeong Pocha",
+      afterpartyGroupLabel: "Food / drink groups",
+      afterpartyMinorLabel: "Minors allowed",
+      afterpartyDirectionsLabel: "Directions",
+    },
+    contactDetails: {
+      websiteLabel: "KCC Official Website",
+      websiteValue: "utkcc.org",
+      websiteAction: "Visit website",
+      instagramLabel: "KCC Instagram",
+      instagramValue: "@utkcc_",
+      instagramAction: "Open Instagram",
     },
     checkin: {
       eyebrow: "Event Desk Check-In",
@@ -174,9 +184,18 @@ const mainCopy = {
       locationNote: "연세대학교",
       directionsLabel: "길찾기",
       afterpartyLabel: "2차 장소",
-      afterpartyValue: "장소 미정",
-      afterpartyNote: "추후 공지",
-      afterpartyDirectionsLabel: "길찾기 준비중",
+      afterpartyValue: "현명포차",
+      afterpartyGroupLabel: "밥팀 / 술팀",
+      afterpartyMinorLabel: "미성년자 가능",
+      afterpartyDirectionsLabel: "길찾기",
+    },
+    contactDetails: {
+      websiteLabel: "KCC 공식 웹사이트",
+      websiteValue: "utkcc.org",
+      websiteAction: "방문하기",
+      instagramLabel: "KCC 인스타그램",
+      instagramValue: "@utkcc_",
+      instagramAction: "인스타그램 열기",
     },
     checkin: {
       eyebrow: "데스크 체크인",
@@ -244,6 +263,7 @@ async function registerAttendeeVisit() {
     });
 
     if (!response.ok) {
+      console.warn("Live attendee counter is unavailable.", await response.json().catch(() => ({})));
       return;
     }
 
@@ -410,6 +430,14 @@ function applyMainLanguage(locale) {
 
   eventDetailItems.forEach((item) => {
     const detailCopy = copy.eventDetails[item.dataset.eventDetail];
+
+    if (detailCopy) {
+      item.textContent = detailCopy;
+    }
+  });
+
+  contactDetailItems.forEach((item) => {
+    const detailCopy = copy.contactDetails[item.dataset.contactDetail];
 
     if (detailCopy) {
       item.textContent = detailCopy;

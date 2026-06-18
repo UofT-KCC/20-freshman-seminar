@@ -24,13 +24,11 @@ function getRequestBody(request) {
 }
 
 async function readAttendees(blobStore) {
-  const result = await blobStore.list({
-    limit: 1,
-    prefix: STORE_PATH,
-  });
-  const blob = result.blobs.find((item) => item.pathname === STORE_PATH);
+  let blob;
 
-  if (!blob) {
+  try {
+    blob = await blobStore.head(STORE_PATH);
+  } catch (error) {
     return [];
   }
 
@@ -56,19 +54,29 @@ async function writeAttendees(blobStore, visitors) {
     {
       access: "public",
       allowOverwrite: true,
+      addRandomSuffix: false,
       contentType: "application/json",
     }
   );
 }
 
 module.exports = async function handler(request, response) {
-  if (request.method !== "POST") {
+  if (!["GET", "POST"].includes(request.method)) {
     sendJson(response, 405, { error: "Method not allowed" });
     return;
   }
 
   try {
     const blobStore = await import("@vercel/blob");
+    const visitors = await readAttendees(blobStore);
+
+    if (request.method === "GET") {
+      sendJson(response, 200, {
+        count: visitors.length,
+      });
+      return;
+    }
+
     const visitorId = getRequestBody(request).visitorId;
 
     if (!isValidVisitorId(visitorId)) {
@@ -76,7 +84,6 @@ module.exports = async function handler(request, response) {
       return;
     }
 
-    const visitors = await readAttendees(blobStore);
     const uniqueVisitors = new Set(visitors);
     uniqueVisitors.add(visitorId);
 
@@ -87,9 +94,8 @@ module.exports = async function handler(request, response) {
       count: nextVisitors.length,
     });
   } catch (error) {
-    sendJson(response, 200, {
-      count: null,
-      storageReady: false,
+    sendJson(response, 500, {
+      error: "Attendee counter storage is not configured.",
     });
   }
 };
