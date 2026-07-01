@@ -862,8 +862,8 @@ nameForm.addEventListener("submit", (event) => {
       nameCard.classList.add("is-step-entering");
       introStepDoneTimer = window.setTimeout(() => {
         nameCard.classList.remove("is-step-entering");
-      }, 230);
-    }, 240);
+      }, 360);
+    }, 420);
     return;
   }
 
