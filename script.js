@@ -56,6 +56,7 @@ const languageButton = document.querySelector("[data-language]");
 const languageLabel = document.querySelector("[data-language-label]");
 const themeButton = document.querySelector("[data-theme]");
 const themeIcon = themeButton.querySelector("ion-icon");
+const powerButton = document.querySelector("[data-power]");
 const weatherIcon = document.querySelector("[data-weather-icon]");
 const weatherTitle = document.querySelector("[data-weather-title]");
 const weatherTemp = document.querySelector("[data-weather-temp]");
@@ -68,8 +69,13 @@ const nameError = document.querySelector("[data-name-error]");
 const introKicker = document.querySelector("[data-intro-kicker]");
 const introTitle = document.querySelector("[data-intro-title]");
 const introLabel = document.querySelector("[data-intro-label]");
+const introOrigin = document.querySelector("[data-intro-origin]");
+const introDestination = document.querySelector("[data-intro-destination]");
 const introFlightTime = document.querySelector("[data-intro-flight-time]");
 const introButton = document.querySelector("[data-intro-button]");
+const destinationLabel = document.querySelector("[data-destination-label]");
+const destinationOptionItems = document.querySelectorAll("[data-destination-option]");
+const locationInputs = document.querySelectorAll("[data-location-input]");
 const heroTitle = document.querySelector("[data-hero-title]");
 const routeLine = document.querySelector("[data-route-line]");
 const eventDetailItems = document.querySelectorAll("[data-event-detail]");
@@ -84,36 +90,157 @@ let guestName = savedState.guestName;
 let introComplete = savedState.introComplete;
 let activePanel = savedState.activePanel;
 let screenDimmed = savedState.screenDimmed;
+let seminarLocation = savedState.seminarLocation;
+let choosingDestination = false;
 let languageUpdateTimer;
 let languageDoneTimer;
-let activeWeatherIndex = 0;
-const ARRIVAL_TIME = new Date("2026-07-11T18:00:00+09:00").getTime();
+let introStepTimer;
+let introStepDoneTimer;
+let screenPoweredOff = false;
+let powerCycleTimer;
+const SCREEN_RESTART_DELAY = 800;
+const seminarLocations = {
+  seoul: {
+    arrivalTime: "2026-07-11T18:00:00+09:00",
+    origin: "TORONTO",
+    destination: "SEOUL",
+    route: {
+      en: ["From Toronto ", " To Seoul"],
+      kr: ["토론토 출발 ", " 서울 도착"],
+    },
+    countdown: {
+      en: "Arriving in · KST",
+      kr: "도착까지 · KST",
+    },
+    introFlightTime: {
+      en: "JUL 11 · DEP 15:00 · ARR 18:00 KST",
+      kr: "7월 11일 · 15:00 - 18:00 KST",
+    },
+    eventDetails: {
+      en: {
+        dateValue: "July 11, 2026 (Sat)",
+        timeValue: "3:00 PM - 6:00 PM",
+        timeNote: "KST · 3 hours",
+        locationValue: "Baekyang Hall S208",
+        locationNote: "Yonsei University",
+        directionsLabel: "Directions",
+        afterpartyValue: "Hyunmyeong Pocha",
+        afterpartyGroupLabel: "Food / drink groups",
+        afterpartyMinorLabel: "Minors allowed",
+        afterpartyDirectionsLabel: "Directions",
+      },
+      kr: {
+        dateValue: "2026. 7. 11. (토)",
+        timeValue: "15:00 - 18:00",
+        timeNote: "KST · 총 3시간",
+        locationValue: "백양관 S208호",
+        locationNote: "연세대학교",
+        directionsLabel: "길찾기",
+        afterpartyValue: "현명포차",
+        afterpartyGroupLabel: "밥팀 / 술팀",
+        afterpartyMinorLabel: "미성년자 가능",
+        afterpartyDirectionsLabel: "길찾기",
+      },
+    },
+    links: {
+      location: {
+        href: "https://kko.to/IlnmU2PcdE",
+        aria: "카카오맵에서 연세대학교 백양관 S208호 오는 길 보기",
+      },
+      afterparty: {
+        href: "https://kko.to/bEmvarGx3s",
+        aria: "카카오맵에서 2차 장소 현명포차 길찾기",
+      },
+    },
+  },
+  toronto: {
+    arrivalTime: "2026-07-11T18:00:00-04:00",
+    origin: "SEOUL",
+    destination: "TORONTO",
+    route: {
+      en: ["From Seoul ", " To Toronto"],
+      kr: ["서울 출발 ", " 토론토 도착"],
+    },
+    countdown: {
+      en: "Arriving in · EDT",
+      kr: "도착까지 · EDT",
+    },
+    introFlightTime: {
+      en: "JUL 11 · DEP 15:00 · ARR 18:00 EDT",
+      kr: "7월 11일 · 15:00 - 18:00 EDT",
+    },
+    eventDetails: {
+      en: {
+        dateValue: "July 11, 2026 (Sat)",
+        timeValue: "3:00 PM - 6:00 PM",
+        timeNote: "EDT · 3 hours",
+        locationValue: "Toronto · Room TBA",
+        locationNote: "University of Toronto",
+        directionsLabel: "Details TBA",
+        afterpartyValue: "Afterparty TBA",
+        afterpartyGroupLabel: "Details coming soon",
+        afterpartyMinorLabel: "Toronto local time",
+        afterpartyDirectionsLabel: "Details TBA",
+      },
+      kr: {
+        dateValue: "2026. 7. 11. (토)",
+        timeValue: "15:00 - 18:00",
+        timeNote: "EDT · 총 3시간",
+        locationValue: "토론토 · 장소 추후 공지",
+        locationNote: "University of Toronto",
+        directionsLabel: "추후 공지",
+        afterpartyValue: "2차 장소 추후 공지",
+        afterpartyGroupLabel: "세부 정보 준비 중",
+        afterpartyMinorLabel: "토론토 현지 시간",
+        afterpartyDirectionsLabel: "추후 공지",
+      },
+    },
+    links: {
+      location: null,
+      afterparty: null,
+    },
+  },
+};
 const introCopy = {
   en: {
     language: "EN",
     kicker: "UTKCC FRESHMAN SEMINAR 2026",
     title: "Welcome Onboard",
+    destinationTitle: "Select Seminar City",
     label: "Your boarding name",
-    flightTime: "JUL 11 · DEP 15:00 · ARR 18:00 KST",
+    destinationLabel: "Choose your seminar city",
+    destinations: {
+      seoulTitle: "Seoul",
+      seoulMeta: "Yonsei · KST",
+      torontoTitle: "Toronto",
+      torontoMeta: "U of T · EDT",
+    },
     placeholder: "Your Name",
     button: "Begin Journey",
+    destinationButton: "Continue",
     error: "Please enter your passenger name.",
   },
   kr: {
     language: "KR",
     kicker: "UTKCC 신입생 세미나 2026",
     title: "환영합니다",
+    destinationTitle: "세미나 도시 선택",
     label: "탑승객 이름",
-    flightTime: "7월 11일 · 출발 15:00 · 도착 18:00 KST",
+    destinationLabel: "세미나 도시 선택",
+    destinations: {
+      seoulTitle: "서울",
+      seoulMeta: "연세대 · KST",
+      torontoTitle: "토론토",
+      torontoMeta: "U of T · EDT",
+    },
     placeholder: "이름",
     button: "여정 시작하기",
+    destinationButton: "계속하기",
     error: "탑승객 이름을 입력해 주세요.",
   },
 };
 const mainCopy = {
   en: {
-    countdown: "Arriving in · KST",
-    route: ["From Seoul ", " To Toronto"],
     welcome: (name) => `Welcome, ${name}.`,
     journey: "Your journey starts here.",
     live: "Live attendees",
@@ -130,18 +257,8 @@ const mainCopy = {
     },
     eventDetails: {
       dateLabel: "Seminar Date",
-      dateValue: "July 11, 2026 (Sat)",
-      timeValue: "3:00 PM - 6:00 PM",
-      timeNote: "KST · 3 hours",
       locationLabel: "Seminar Location",
-      locationValue: "Baekyang Hall S208",
-      locationNote: "Yonsei University",
-      directionsLabel: "Directions",
       afterpartyLabel: "Afterparty Venue",
-      afterpartyValue: "Hyunmyeong Pocha",
-      afterpartyGroupLabel: "Food / drink groups",
-      afterpartyMinorLabel: "Minors allowed",
-      afterpartyDirectionsLabel: "Directions",
     },
     contactDetails: {
       websiteLabel: "KCC Official Website",
@@ -158,8 +275,6 @@ const mainCopy = {
     },
   },
   kr: {
-    countdown: "도착까지 · KST",
-    route: ["서울 출발 ", " 토론토 도착"],
     welcome: (name) => `${name}님, 환영합니다.`,
     journey: "여정이 곧 시작됩니다.",
     live: "실시간 탑승객",
@@ -176,18 +291,8 @@ const mainCopy = {
     },
     eventDetails: {
       dateLabel: "세미나 일정",
-      dateValue: "2026. 7. 11. (토)",
-      timeValue: "15:00 - 18:00",
-      timeNote: "KST · 총 3시간",
       locationLabel: "세미나 장소",
-      locationValue: "백양관 S208호",
-      locationNote: "연세대학교",
-      directionsLabel: "길찾기",
       afterpartyLabel: "2차 장소",
-      afterpartyValue: "현명포차",
-      afterpartyGroupLabel: "밥팀 / 술팀",
-      afterpartyMinorLabel: "미성년자 가능",
-      afterpartyDirectionsLabel: "길찾기",
     },
     contactDetails: {
       websiteLabel: "KCC 공식 웹사이트",
@@ -205,8 +310,8 @@ const mainCopy = {
   },
 };
 
-const weatherLocations = [
-  {
+const weatherLocations = {
+  toronto: {
     title: { en: "Weather in Toronto", kr: "토론토 날씨" },
     city: { en: "Toronto", kr: "토론토" },
     fallbackLabel: { en: "Partly Cloudy", kr: "구름 조금" },
@@ -214,7 +319,7 @@ const weatherLocations = [
     endpoint:
       "https://api.open-meteo.com/v1/forecast?latitude=43.6532&longitude=-79.3832&current=temperature_2m,weather_code&timezone=America%2FToronto",
   },
-  {
+  seoul: {
     title: { en: "Weather in Seoul", kr: "서울 날씨" },
     city: { en: "Seoul", kr: "서울" },
     fallbackLabel: { en: "Partly Cloudy", kr: "구름 조금" },
@@ -222,7 +327,7 @@ const weatherLocations = [
     endpoint:
       "https://api.open-meteo.com/v1/forecast?latitude=37.5665&longitude=126.9780&current=temperature_2m,weather_code&timezone=Asia%2FSeoul",
   },
-];
+};
 
 liveCount.textContent = "0";
 
@@ -312,6 +417,9 @@ function readSavedState() {
     introComplete: parsed?.introComplete === true,
     activePanel: savedPanel,
     screenDimmed: parsed?.screenDimmed === true,
+    seminarLocation: ["seoul", "toronto"].includes(parsed?.seminarLocation)
+      ? parsed.seminarLocation
+      : "seoul",
   };
 }
 
@@ -322,6 +430,7 @@ function persistState() {
     introComplete,
     activePanel,
     screenDimmed,
+    seminarLocation,
   };
 
   window.history.replaceState(
@@ -355,7 +464,8 @@ function formatArrivalCountdown(milliseconds) {
 }
 
 function updateArrivalCountdown() {
-  arrivalCountdown.textContent = formatArrivalCountdown(ARRIVAL_TIME - Date.now());
+  const arrivalTime = new Date(seminarLocations[seminarLocation].arrivalTime).getTime();
+  arrivalCountdown.textContent = formatArrivalCountdown(arrivalTime - Date.now());
 }
 
 updateArrivalCountdown();
@@ -406,22 +516,63 @@ function setWelcomeTitle() {
 
 function setRouteLine() {
   const locale = korean ? "kr" : "en";
-  const copy = mainCopy[locale];
+  const route = seminarLocations[seminarLocation].route[locale];
   const flightIcon = document.createElement("span");
 
   flightIcon.setAttribute("aria-hidden", "true");
   flightIcon.textContent = "✈";
   routeLine.replaceChildren(
-    document.createTextNode(copy.route[0]),
+    document.createTextNode(route[0]),
     flightIcon,
-    document.createTextNode(copy.route[1])
+    document.createTextNode(route[1])
   );
+}
+
+function setEventLink(linkElement, linkConfig) {
+  if (!linkElement) {
+    return;
+  }
+
+  if (!linkConfig) {
+    linkElement.removeAttribute("href");
+    linkElement.removeAttribute("target");
+    linkElement.removeAttribute("rel");
+    linkElement.setAttribute("aria-disabled", "true");
+    return;
+  }
+
+  linkElement.href = linkConfig.href;
+  linkElement.target = "_blank";
+  linkElement.rel = "noopener noreferrer";
+  linkElement.setAttribute("aria-label", linkConfig.aria);
+  linkElement.removeAttribute("aria-disabled");
+}
+
+function applySeminarLocationDetails(locale) {
+  const locationCopy = seminarLocations[seminarLocation];
+  const locationDetailCopy = locationCopy.eventDetails[locale];
+  const locationTile = document.querySelector('[data-event-detail="locationValue"]')?.closest("a");
+  const afterpartyTile = document.querySelector('[data-event-detail="afterpartyValue"]')?.closest("a");
+
+  countdownLabel.textContent = locationCopy.countdown[locale];
+  introOrigin.textContent = locationCopy.origin;
+  introDestination.textContent = locationCopy.destination;
+  introFlightTime.textContent = locationCopy.introFlightTime[locale];
+  setEventLink(locationTile, locationCopy.links.location);
+  setEventLink(afterpartyTile, locationCopy.links.afterparty);
+
+  eventDetailItems.forEach((item) => {
+    const detailCopy = locationDetailCopy[item.dataset.eventDetail];
+
+    if (detailCopy) {
+      item.textContent = detailCopy;
+    }
+  });
 }
 
 function applyMainLanguage(locale) {
   const copy = mainCopy[locale];
 
-  countdownLabel.textContent = copy.countdown;
   liveLabel.textContent = copy.live;
 
   cards.forEach((card) => {
@@ -444,7 +595,9 @@ function applyMainLanguage(locale) {
   });
 
   eventDetailItems.forEach((item) => {
-    const detailCopy = copy.eventDetails[item.dataset.eventDetail];
+    const detailCopy =
+      copy.eventDetails[item.dataset.eventDetail] ||
+      seminarLocations[seminarLocation].eventDetails[locale][item.dataset.eventDetail];
 
     if (detailCopy) {
       item.textContent = detailCopy;
@@ -467,9 +620,24 @@ function applyMainLanguage(locale) {
     }
   });
 
+  applySeminarLocationDetails(locale);
   setRouteLine();
   setWelcomeTitle();
   renderWeatherLabel();
+  updateArrivalCountdown();
+}
+
+function updateIntroStep() {
+  const locale = korean ? "kr" : "en";
+  const copy = introCopy[locale];
+
+  nameCard.classList.toggle("is-choosing-destination", choosingDestination);
+  introTitle.textContent = choosingDestination ? copy.destinationTitle : copy.title;
+  introButton.textContent = choosingDestination ? copy.destinationButton : copy.button;
+
+  if (choosingDestination) {
+    clearNameError();
+  }
 }
 
 function setHomeView() {
@@ -521,6 +689,10 @@ navButtons.forEach((button) => {
 function applyScreenBrightness() {
   document.body.classList.toggle("is-screen-dimmed", screenDimmed);
   themeButton.setAttribute("aria-pressed", String(screenDimmed));
+  themeButton.setAttribute(
+    "aria-label",
+    screenDimmed ? "Restore screen brightness" : "Dim screen brightness"
+  );
   themeIcon.setAttribute("name", screenDimmed ? "moon-outline" : "sunny-outline");
 }
 
@@ -530,19 +702,89 @@ themeButton.addEventListener("click", () => {
   persistState();
 });
 
+function resetIntroState() {
+  window.clearTimeout(introStepTimer);
+  guestName = "Your Name";
+  introComplete = false;
+  activePanel = null;
+  choosingDestination = false;
+  nameInput.value = "";
+  clearNameError();
+  nameCard.classList.remove(
+    "is-step-changing",
+    "is-step-splitting",
+    "is-step-entering",
+    "has-step-transitioned",
+    "is-choosing-destination"
+  );
+  document.body.classList.remove(
+    "intro-complete",
+    "intro-exiting",
+    "panel-view",
+    "home-enter",
+    "panel-enter"
+  );
+  document.body.classList.add("intro-active");
+  cards.forEach((card) => card.classList.remove("is-active"));
+  contentPanels.forEach((contentPanel) => contentPanel.classList.remove("is-active"));
+  navButtons.forEach((item) => item.classList.remove("is-active"));
+  document.querySelector('[data-nav="home"]')?.classList.add("is-active");
+  applyIntroLanguage(korean ? "kr" : "en");
+  persistState();
+}
+
+function restartScreenAfterShutdown() {
+  screenPoweredOff = false;
+  document.body.classList.remove("is-screen-off");
+  powerButton.disabled = false;
+  powerButton.setAttribute("aria-label", "Turn screen off and restart");
+  powerButton.setAttribute("aria-pressed", "false");
+  resetIntroState();
+
+  window.setTimeout(() => {
+    if (document.body.classList.contains("intro-active")) {
+      nameInput.focus();
+    }
+  }, 380);
+}
+
+function runScreenPowerCycle() {
+  if (screenPoweredOff) {
+    return;
+  }
+
+  window.clearTimeout(powerCycleTimer);
+  screenPoweredOff = true;
+  document.body.classList.add("is-screen-off");
+  powerButton.disabled = true;
+  powerButton.setAttribute("aria-label", "Restarting screen");
+  powerButton.setAttribute("aria-pressed", "true");
+  powerCycleTimer = window.setTimeout(restartScreenAfterShutdown, SCREEN_RESTART_DELAY);
+}
+
+powerButton.addEventListener("click", () => {
+  runScreenPowerCycle();
+});
+
 function applyIntroLanguage(locale) {
   const copy = introCopy[locale];
 
   nameCard.classList.toggle("is-korean", locale === "kr");
   languageLabel.textContent = copy.language;
   introKicker.textContent = copy.kicker;
-  introTitle.textContent = copy.title;
   introLabel.textContent = copy.label;
-  introFlightTime.textContent = copy.flightTime;
-  introButton.textContent = copy.button;
+  destinationLabel.textContent = copy.destinationLabel;
+  destinationOptionItems.forEach((item) => {
+    const destinationCopy = copy.destinations[item.dataset.destinationOption];
+
+    if (destinationCopy) {
+      item.textContent = destinationCopy;
+    }
+  });
   nameError.textContent = copy.error;
   nameInput.placeholder = copy.placeholder;
   applyMainLanguage(locale);
+  updateIntroStep();
 }
 
 function showNameError() {
@@ -582,18 +824,49 @@ languageButton.addEventListener("click", () => {
   }, 260);
 });
 
+locationInputs.forEach((input) => {
+  input.addEventListener("change", () => {
+    if (!input.checked || !seminarLocations[input.value]) {
+      return;
+    }
+
+    seminarLocation = input.value;
+    applyMainLanguage(korean ? "kr" : "en");
+    persistState();
+    updateWeather();
+  });
+});
+
 nameForm.addEventListener("submit", (event) => {
   event.preventDefault();
 
   const submittedName = nameInput.value.trim().replace(/\s+/g, " ");
 
-  if (!submittedName) {
+  if (!choosingDestination && !submittedName) {
     showNameError();
     return;
   }
 
-  clearNameError();
-  guestName = submittedName;
+  if (!choosingDestination) {
+    clearNameError();
+    guestName = submittedName;
+    window.clearTimeout(introStepTimer);
+    window.clearTimeout(introStepDoneTimer);
+    nameCard.classList.remove("is-step-changing", "is-step-entering");
+    nameCard.classList.add("has-step-transitioned", "is-step-splitting");
+    choosingDestination = true;
+    introStepTimer = window.setTimeout(() => {
+      updateIntroStep();
+      persistState();
+      nameCard.classList.remove("is-step-splitting");
+      nameCard.classList.add("is-step-entering");
+      introStepDoneTimer = window.setTimeout(() => {
+        nameCard.classList.remove("is-step-entering");
+      }, 230);
+    }, 240);
+    return;
+  }
+
   introComplete = true;
   persistState();
   setWelcomeTitle();
@@ -637,7 +910,7 @@ const weatherCodes = {
 };
 
 function renderWeatherLabel() {
-  const location = weatherLocations[activeWeatherIndex];
+  const location = weatherLocations[seminarLocation];
   const locale = korean ? "kr" : "en";
   const weather = location.current;
   const compactWeatherTitle = window.matchMedia("(max-width: 700px)").matches;
@@ -668,6 +941,9 @@ function restoreSavedView() {
   applyScreenBrightness();
   languageButton.setAttribute("aria-pressed", String(korean));
   nameInput.value = guestName === "Your Name" ? "" : guestName;
+  locationInputs.forEach((input) => {
+    input.checked = input.value === seminarLocation;
+  });
 
   if (!introComplete) {
     return;
@@ -715,25 +991,11 @@ async function fetchLocationWeather(location) {
 }
 
 async function updateWeather() {
-  await Promise.all(weatherLocations.map(fetchLocationWeather));
+  await fetchLocationWeather(weatherLocations[seminarLocation]);
   renderWeatherLabel();
-}
-
-function rotateWeather() {
-  const weather = weatherTitle.closest(".weather");
-
-  weather.classList.add("is-weather-swapping");
-  window.setTimeout(() => {
-    activeWeatherIndex = (activeWeatherIndex + 1) % weatherLocations.length;
-    renderWeatherLabel();
-  }, 140);
-  window.setTimeout(() => {
-    weather.classList.remove("is-weather-swapping");
-  }, 240);
 }
 
 updateWeather();
 registerAttendeeVisit();
-window.setInterval(rotateWeather, 5000);
 window.setInterval(updateWeather, 600000);
 window.addEventListener("resize", renderWeatherLabel);

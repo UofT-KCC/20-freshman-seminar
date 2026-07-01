@@ -33,12 +33,12 @@
               <p data-intro-kicker>UTKCC FRESHMAN SEMINAR 2026</p>
               <h2 id="intro-title" data-intro-title>Welcome Onboard</h2>
               <div class="intro-flight-meta" aria-label="Flight information">
-                <span>SEOUL</span>
+                <span data-intro-origin>SEOUL</span>
                 <i aria-hidden="true">✈</i>
-                <span>TORONTO</span>
+                <span data-intro-destination>TORONTO</span>
                 <strong data-intro-flight-time>JUL 11 · DEP 15:00 · ARR 18:00 KST</strong>
               </div>
-              <label>
+              <label class="name-step">
                 <span data-intro-label>Your boarding name</span>
                 <input
                   type="text"
@@ -50,6 +50,25 @@
                   aria-describedby="name-error"
                 />
               </label>
+              <fieldset class="destination-choice" data-destination-choice>
+                <legend data-destination-label>Choose your seminar city</legend>
+                <div class="destination-options">
+                  <label>
+                    <input type="radio" name="seminarLocation" value="seoul" data-location-input />
+                    <span>
+                      <strong data-destination-option="seoulTitle">Seoul</strong>
+                      <small data-destination-option="seoulMeta">Yonsei · KST</small>
+                    </span>
+                  </label>
+                  <label>
+                    <input type="radio" name="seminarLocation" value="toronto" data-location-input />
+                    <span>
+                      <strong data-destination-option="torontoTitle">Toronto</strong>
+                      <small data-destination-option="torontoMeta">U of T · EDT</small>
+                    </span>
+                  </label>
+                </div>
+              </fieldset>
               <p class="form-error" id="name-error" data-name-error aria-live="polite">
                 Please enter your passenger name.
               </p>
@@ -228,6 +247,9 @@
               </button>
               <button class="control" type="button" data-theme aria-label="Toggle screen brightness">
                 <ion-icon name="sunny-outline" aria-hidden="true"></ion-icon>
+              </button>
+              <button class="control control-power" type="button" data-power aria-label="Turn screen off">
+                <ion-icon name="power-outline" aria-hidden="true"></ion-icon>
               </button>
             </div>
             <div class="live">
