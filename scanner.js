@@ -4,6 +4,8 @@ const qrStopButton = document.querySelector("[data-qr-stop]");
 const qrStatus = document.querySelector("[data-scanner-status]");
 const qrResult = document.querySelector("[data-scanner-result]");
 const scannerState = document.querySelector("[data-scanner-state]");
+const manualCheckinForm = document.querySelector("[data-manual-checkin]");
+const manualTicketInput = document.querySelector("[data-manual-ticket]");
 
 let qrStream;
 let qrAnimationFrame;
@@ -39,8 +41,34 @@ function setScannerStatus(key, value) {
   scannerState.dataset.state = key;
 }
 
+function normalizeQrValue(value) {
+  const rawValue = String(value || "").trim();
+
+  if (!rawValue) {
+    return "";
+  }
+
+  try {
+    const url = new URL(rawValue);
+    const queryValue = url.searchParams.get("text") || url.searchParams.get("data") || url.searchParams.get("qr");
+
+    if (queryValue) {
+      return queryValue.trim();
+    }
+  } catch (error) {
+    // Plain QR payloads are expected; URLs are only a compatibility path.
+  }
+
+  try {
+    return decodeURIComponent(rawValue).trim();
+  } catch (error) {
+    return rawValue;
+  }
+}
+
 function parseTicketValue(value) {
-  const match = String(value || "").trim().match(/^UTKCC2026:(seoul|toronto):([a-zA-Z0-9_-]{6,40})$/);
+  const normalizedValue = normalizeQrValue(value);
+  const match = normalizedValue.match(/^UTKCC2026:(seoul|toronto):([a-zA-Z0-9_-]{6,80})$/i);
 
   if (!match) {
     return null;
@@ -73,6 +101,7 @@ function showScannerResult(type, title, message, attendee) {
 }
 
 async function checkInTicket(qrValue) {
+  const normalizedQrValue = normalizeQrValue(qrValue);
   const ticket = parseTicketValue(qrValue);
 
   if (!ticket) {
@@ -94,7 +123,7 @@ async function checkInTicket(qrValue) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        qrValue,
+        qrValue: normalizedQrValue,
       }),
     });
 
@@ -233,6 +262,12 @@ function stopQrScanner(showStoppedStatus = true) {
 
 qrStartButton.addEventListener("click", startQrScanner);
 qrStopButton.addEventListener("click", () => stopQrScanner(true));
+
+manualCheckinForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  stopQrScanner(false);
+  await checkInTicket(manualTicketInput.value);
+});
 
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) {

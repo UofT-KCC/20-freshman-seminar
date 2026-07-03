@@ -147,22 +147,38 @@ UTKCC2026:toronto:N4X7B2M9LA
 Use a Google Sheet with a header row containing these columns:
 
 ```text
-Ticket ID | Name | Email | City | Status | Checked In At | Checked In By | Notes
+Name | Email | City | Checked In At | Notes | QR Payload | QR Code
 ```
 
 Minimum required columns:
 
 ```text
-Ticket ID | City | Status | Checked In At
+Checked In At | QR Payload
 ```
 
 Recommended values:
 
-- `Ticket ID`: unique value such as `A8K29QZ4P1`
+- `Name`: attendee name, for staff display
+- `Email`: optional admin reference
 - `City`: `seoul` or `toronto`
-- `Status`: start as `Not checked in`
-- `Checked In At`: leave blank
-- `Checked In By`: optional, filled as `Scanner`
+- `Checked In At`: leave blank; the scanner fills it when checked in
+- `Notes`: optional admin notes
+- `QR Payload`: generated from attendee row data
+- `QR Code`: generated QR image for printing or boarding-pass placement
+
+Use this formula in `F2`:
+
+```text
+=IF(OR(A2="",C2=""),"","UTKCC2026:"&LOWER(C2)&":FS"&TEXT(ROW()-1,"0000")&"-"&REGEXREPLACE(UPPER(LEFT(A2,3)&LEFT(B2,FIND("@",B2&"@")-1)),"[^A-Z0-9_-]",""))
+```
+
+Use this formula in `G2`:
+
+```text
+=IF(F2="","",IMAGE("https://quickchart.io/qr?text="&ENCODEURL(F2)&"&size=220"))
+```
+
+Drag both formulas down for attendee rows. The scanner accepts either a camera scan of the QR image or a manual paste of the `QR Payload` value. Avoid sorting rows after QR codes are printed because the formula uses the row number as part of the generated ticket code.
 
 The scanner page calls:
 

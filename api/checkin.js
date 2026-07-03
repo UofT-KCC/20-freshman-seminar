@@ -13,6 +13,7 @@ const HEADER_ALIASES = {
   status: ["status", "check in status", "check-in status"],
   checkedInAt: ["checked in at", "check in time", "checkedin at"],
   checkedInBy: ["checked in by", "staff", "scanner"],
+  qrPayload: ["qr payload", "payload", "qr text", "qr value"],
 };
 
 function sendJson(response, statusCode, payload) {
@@ -47,7 +48,7 @@ function parseQrValue(value) {
     return null;
   }
 
-  const match = value.trim().match(/^UTKCC2026:(seoul|toronto):([a-zA-Z0-9_-]{6,40})$/);
+  const match = value.trim().match(/^UTKCC2026:(seoul|toronto):([a-zA-Z0-9_-]{6,80})$/i);
 
   if (!match) {
     return null;
@@ -57,6 +58,7 @@ function parseQrValue(value) {
     eventCode: EVENT_CODE,
     city: match[1].toLowerCase(),
     ticketId: match[2].toUpperCase(),
+    payload: `${EVENT_CODE}:${match[1].toLowerCase()}:${match[2].toUpperCase()}`,
   };
 }
 
@@ -205,6 +207,11 @@ function getCell(row, index) {
   return index >= 0 ? String(row[index] || "").trim() : "";
 }
 
+function normalizeQrPayload(value) {
+  const parsedValue = parseQrValue(value);
+  return parsedValue ? parsedValue.payload : "";
+}
+
 function isCheckedInStatus(status) {
   const normalizedStatus = normalizeHeader(status);
 
@@ -254,19 +261,24 @@ module.exports = async function handler(request, response) {
     const headers = values[0] || [];
     const columns = mapHeaders(headers);
 
-    if (columns.ticketId < 0 || columns.city < 0 || columns.status < 0 || columns.checkedInAt < 0) {
+    if (columns.checkedInAt < 0 || (columns.qrPayload < 0 && columns.ticketId < 0)) {
       sendJson(response, 500, {
         ok: false,
         code: "SHEET_COLUMNS_MISSING",
         title: "SHEET SETUP ERROR",
-        message: "Ticket ID, City, Status, Checked In At 컬럼이 필요합니다.",
+        message: "QR Payload와 Checked In At 컬럼이 필요합니다.",
       });
       return;
     }
 
+    const expectedPayload = parsedQr.payload;
     const attendeeRowIndex = values.findIndex((row, index) => {
       if (index === 0) {
         return false;
+      }
+
+      if (columns.qrPayload >= 0) {
+        return normalizeQrPayload(getCell(row, columns.qrPayload)) === expectedPayload;
       }
 
       return getCell(row, columns.ticketId).toUpperCase() === parsedQr.ticketId;
@@ -288,7 +300,7 @@ module.exports = async function handler(request, response) {
     const attendeeStatus = getCell(attendeeRow, columns.status).toLowerCase();
     const checkedInAt = getCell(attendeeRow, columns.checkedInAt);
 
-    if (attendeeCity !== parsedQr.city) {
+    if (attendeeCity && attendeeCity !== parsedQr.city) {
       sendJson(response, 200, {
         ok: false,
         code: "CITY_MISMATCH",
@@ -303,7 +315,7 @@ module.exports = async function handler(request, response) {
       return;
     }
 
-    if (isCheckedInStatus(attendeeStatus)) {
+    if (checkedInAt || isCheckedInStatus(attendeeStatus)) {
       sendJson(response, 200, {
         ok: true,
         code: "ALREADY_CHECKED_IN",
@@ -322,14 +334,17 @@ module.exports = async function handler(request, response) {
     const now = new Date().toISOString();
     const updates = [
       {
-        columnIndex: columns.status,
-        value: "Checked in",
-      },
-      {
         columnIndex: columns.checkedInAt,
         value: now,
       },
     ];
+
+    if (columns.status >= 0) {
+      updates.push({
+        columnIndex: columns.status,
+        value: "Checked in",
+      });
+    }
 
     if (columns.checkedInBy >= 0) {
       updates.push({
