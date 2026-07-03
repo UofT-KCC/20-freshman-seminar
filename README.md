@@ -40,7 +40,8 @@ The experience supports two seminar tracks:
 ├── scanner.html               # Check-in scanner page
 ├── scanner.js                 # Scanner page behavior
 ├── api/
-│   └── attendees.js           # Live attendee count API
+│   ├── attendees.js           # Live attendee count API
+│   └── checkin.js             # Google Sheets-backed QR check-in API
 ├── images/
 │   ├── boarding-pass.png      # Boarding pass asset
 │   ├── desktop-screen.png     # Wide desktop screen frame
@@ -133,6 +134,57 @@ Required production environment variable:
 ```text
 BLOB_READ_WRITE_TOKEN
 ```
+
+### QR Check-In with Google Sheets
+
+The staff scanner validates QR payloads in this format:
+
+```text
+UTKCC2026:seoul:A8K29QZ4P1
+UTKCC2026:toronto:N4X7B2M9LA
+```
+
+Use a Google Sheet with a header row containing these columns:
+
+```text
+Ticket ID | Name | Email | City | Status | Checked In At | Checked In By | Notes
+```
+
+Minimum required columns:
+
+```text
+Ticket ID | City | Status | Checked In At
+```
+
+Recommended values:
+
+- `Ticket ID`: unique value such as `A8K29QZ4P1`
+- `City`: `seoul` or `toronto`
+- `Status`: start as `Not checked in`
+- `Checked In At`: leave blank
+- `Checked In By`: optional, filled as `Scanner`
+
+The scanner page calls:
+
+```text
+api/checkin.js
+```
+
+Required production environment variables:
+
+```text
+GOOGLE_SHEETS_CLIENT_EMAIL
+GOOGLE_SHEETS_PRIVATE_KEY
+GOOGLE_SHEETS_SPREADSHEET_ID
+```
+
+Optional:
+
+```text
+GOOGLE_SHEETS_ATTENDEES_RANGE=Attendees!A:H
+```
+
+Create a Google Cloud service account, enable the Google Sheets API, and share the attendee spreadsheet with the service account email as an editor. Store the private key with newline characters escaped as `\n` if your host requires one-line environment variables.
 
 ---
 
