@@ -4,6 +4,7 @@ const EVENT_CODE = "UTKCC2026";
 const DEFAULT_RANGE = "Attendees!A:H";
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 const SHEETS_SCOPE = "https://www.googleapis.com/auth/spreadsheets";
+const GOOGLE_SHEETS_API_URL = "https://sheets.googleapis.com/v4/spreadsheets";
 
 const HEADER_ALIASES = {
   ticketId: ["ticket id", "ticket", "id", "qr id", "qr"],
@@ -150,7 +151,7 @@ async function getAccessToken(config) {
   });
 
   if (!tokenResponse.ok) {
-    throw new Error("Google Sheets authentication failed.");
+    throw new Error(`Google Sheets authentication failed (${tokenResponse.status}).`);
   }
 
   const tokenData = await tokenResponse.json();
@@ -159,7 +160,7 @@ async function getAccessToken(config) {
 
 async function getSheetValues(config, accessToken) {
   const url = new URL(
-    `https://sheets.googleapis.com/v4/spreadsheets/${config.spreadsheetId}/values/${encodeURIComponent(config.range)}`
+    `${GOOGLE_SHEETS_API_URL}/${config.spreadsheetId}/values/${encodeURIComponent(config.range)}`
   );
 
   const response = await fetch(url, {
@@ -169,7 +170,7 @@ async function getSheetValues(config, accessToken) {
   });
 
   if (!response.ok) {
-    throw new Error("Could not read attendee sheet.");
+    throw new Error(`Could not read attendee sheet (${response.status}).`);
   }
 
   const data = await response.json();
@@ -184,7 +185,7 @@ async function updateSheetCells(config, accessToken, rowNumber, updates) {
   }));
 
   const response = await fetch(
-    `https://sheets.googleapis.com/v4/spreadsheets/${config.spreadsheetId}/values:batchUpdate`,
+    `${GOOGLE_SHEETS_API_URL}/${config.spreadsheetId}/values:batchUpdate`,
     {
       method: "POST",
       headers: {
@@ -199,7 +200,7 @@ async function updateSheetCells(config, accessToken, rowNumber, updates) {
   );
 
   if (!response.ok) {
-    throw new Error("Could not update attendee sheet.");
+    throw new Error(`Could not update attendee sheet (${response.status}).`);
   }
 }
 
@@ -222,6 +223,28 @@ function isCheckedInStatus(status) {
   return ["checked in", "checked-in", "complete", "completed", "done", "yes", "y", "완료", "체크인"].includes(
     normalizedStatus
   );
+}
+
+function checkinErrorMessage(error) {
+  const message = error instanceof Error ? error.message : "";
+
+  if (message.includes("authentication failed")) {
+    return "Google service account private key or client email is wrong.";
+  }
+
+  if (message.includes("read attendee sheet (403)")) {
+    return "Google Sheet is not shared with the service account as Editor, or Google Sheets API is not enabled.";
+  }
+
+  if (message.includes("read attendee sheet (404)")) {
+    return "Spreadsheet ID, tab name, or range is wrong. The tab must be named Attendees unless GOOGLE_SHEETS_ATTENDEES_RANGE is changed.";
+  }
+
+  if (message.includes("update attendee sheet (403)")) {
+    return "The service account can read the sheet but cannot edit it. Share the sheet with Editor access.";
+  }
+
+  return "Google Sheets check-in failed. Check sheet sharing, tab name, API access, and Vercel env vars.";
 }
 
 module.exports = async function handler(request, response) {
@@ -372,7 +395,7 @@ module.exports = async function handler(request, response) {
       ok: false,
       code: "CHECKIN_FAILED",
       title: "CHECK-IN FAILED",
-      message: "Google Sheets 체크인 처리 중 문제가 발생했습니다.",
+      message: checkinErrorMessage(error),
     });
   }
 };
