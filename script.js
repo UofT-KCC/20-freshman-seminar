@@ -106,11 +106,11 @@ const SCREEN_RESTART_DELAY = 800;
 const seminarLocations = {
   seoul: {
     arrivalTime: "2026-07-11T18:00:00+09:00",
-    origin: "TORONTO",
-    destination: "SEOUL",
+    origin: "SEOUL",
+    destination: "TORONTO",
     route: {
-      en: ["From Toronto ", " To Seoul"],
-      kr: ["토론토 출발 ", " 서울 도착"],
+      en: ["From Seoul ", " To Toronto"],
+      kr: ["서울 출발 ", " 토론토 도착"],
     },
     countdown: {
       en: "Arriving in · KST",
