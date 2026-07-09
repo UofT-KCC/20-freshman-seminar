@@ -81,6 +81,10 @@ const routeLine = document.querySelector("[data-route-line]");
 const eventDetailItems = document.querySelectorAll("[data-event-detail]");
 const contactDetailItems = document.querySelectorAll("[data-contact-detail]");
 const checkinCopyItems = document.querySelectorAll("[data-checkin-copy]");
+const programSeoul = document.querySelector("[data-program-seoul]");
+const programToronto = document.querySelector("[data-program-toronto]");
+const programDetailItems = document.querySelectorAll("[data-program-detail]");
+const programPlaceholderItems = document.querySelectorAll("[data-program-placeholder]");
 
 const SESSION_STATE_KEY = "utkccFreshmanSeminarState";
 const ATTENDEE_ID_KEY = "utkccFreshmanSeminarAttendeeId";
@@ -154,7 +158,7 @@ const seminarLocations = {
     },
   },
   toronto: {
-    arrivalTime: "2026-07-11T18:00:00-04:00",
+    arrivalTime: "2026-07-18T18:00:00-04:00",
     origin: "SEOUL",
     destination: "TORONTO",
     route: {
@@ -166,29 +170,29 @@ const seminarLocations = {
       kr: "도착까지 · EDT",
     },
     introFlightTime: {
-      en: "JUL 11 · DEP 15:00 · ARR 18:00 EDT",
-      kr: "7월 11일 · 15:00 - 18:00 EDT",
+      en: "JUL 18 · DEP 15:00 · ARR 18:00 EDT",
+      kr: "7월 18일 · 15:00 - 18:00 EDT",
     },
     eventDetails: {
       en: {
-        dateValue: "July 11, 2026 (Sat)",
+        dateValue: "July 18, 2026 (Sat)",
         timeValue: "3:00 PM - 6:00 PM",
         timeNote: "EDT · 3 hours",
-        locationValue: "Toronto · Room TBA",
+        locationValue: "Bahen Centre BA 1190",
         locationNote: "University of Toronto",
-        directionsLabel: "Details TBA",
+        directionsLabel: "Directions",
         afterpartyValue: "Afterparty TBA",
         afterpartyGroupLabel: "Details coming soon",
         afterpartyMinorLabel: "Toronto local time",
         afterpartyDirectionsLabel: "Details TBA",
       },
       kr: {
-        dateValue: "2026. 7. 11. (토)",
+        dateValue: "2026. 7. 18. (토)",
         timeValue: "15:00 - 18:00",
         timeNote: "EDT · 총 3시간",
-        locationValue: "토론토 · 장소 추후 공지",
+        locationValue: "Bahen Centre BA 1190",
         locationNote: "University of Toronto",
-        directionsLabel: "추후 공지",
+        directionsLabel: "길찾기",
         afterpartyValue: "2차 장소 추후 공지",
         afterpartyGroupLabel: "세부 정보 준비 중",
         afterpartyMinorLabel: "토론토 현지 시간",
@@ -196,7 +200,10 @@ const seminarLocations = {
       },
     },
     links: {
-      location: null,
+      location: {
+        href: "https://www.google.com/maps/search/?api=1&query=Bahen%20Centre%20for%20Information%20Technology%20BA%201190%20University%20of%20Toronto",
+        aria: "Open directions to Bahen Centre for Information Technology BA 1190 at University of Toronto",
+      },
       afterparty: null,
     },
   },
@@ -253,6 +260,7 @@ const mainCopy = {
     },
     headings: {
       event: "Event at a glance",
+      program: "Seminar program",
       contact: "Contact us",
     },
     eventDetails: {
@@ -273,6 +281,21 @@ const mainCopy = {
       title: "Please check in at the desk",
       body: "When you arrive, show your name or QR code to the UTKCC staff at the front desk.",
     },
+    programPlaceholder: {
+      title: "Toronto program coming soon",
+      body: "Program details will be announced before the seminar.",
+    },
+    programDetails: {
+      missionLabel: "Mission Run",
+      missionTitle: "KCC Mission Run & Raffle",
+      missionBody: "Complete team missions and win prizes.",
+      panelLabel: "Panel Session",
+      panelTitle: "Upper-Year Student Panel",
+      panelBody: "UT tips from senior students.",
+      mentoringLabel: "Mentoring Session",
+      mentoringTitle: "Major Mentoring",
+      mentoringBody: "Ask your department mentors anything.",
+    },
   },
   kr: {
     welcome: (name) => `${name}님, 환영합니다.`,
@@ -287,6 +310,7 @@ const mainCopy = {
     },
     headings: {
       event: "행사 한눈에 보기",
+      program: "세미나 프로그램",
       contact: "문의하기",
     },
     eventDetails: {
@@ -306,6 +330,21 @@ const mainCopy = {
       eyebrow: "데스크 체크인",
       title: "데스크에서 확인해 주세요",
       body: "도착하시면 입구 데스크의 UTKCC 임원에게 이름 또는 QR 코드를 보여 주세요.",
+    },
+    programPlaceholder: {
+      title: "토론토 프로그램 준비 중",
+      body: "세미나 전 프로그램 세부 정보를 안내드릴 예정입니다.",
+    },
+    programDetails: {
+      missionLabel: "미션 런",
+      missionTitle: "KCC 미션 런 & 래플",
+      missionBody: "팀별로 미션 수행하고 상품 받자~",
+      panelLabel: "패널 세션",
+      panelTitle: "고학번 선배 패널",
+      panelBody: "고학번 선배들이 알려주는 유티 꿀팁",
+      mentoringLabel: "멘토링 세션",
+      mentoringTitle: "과별 멘토링",
+      mentoringBody: "과별 멘토링 세션에서 다 물어보세요!",
     },
   },
 };
@@ -561,6 +600,11 @@ function applySeminarLocationDetails(locale) {
   setEventLink(locationTile, locationCopy.links.location);
   setEventLink(afterpartyTile, locationCopy.links.afterparty);
 
+  if (programSeoul && programToronto) {
+    programSeoul.hidden = seminarLocation !== "seoul";
+    programToronto.hidden = seminarLocation === "seoul";
+  }
+
   eventDetailItems.forEach((item) => {
     const detailCopy = locationDetailCopy[item.dataset.eventDetail];
 
@@ -617,6 +661,22 @@ function applyMainLanguage(locale) {
 
     if (checkinCopy) {
       item.textContent = checkinCopy;
+    }
+  });
+
+  programPlaceholderItems.forEach((item) => {
+    const programCopy = copy.programPlaceholder[item.dataset.programPlaceholder];
+
+    if (programCopy) {
+      item.textContent = programCopy;
+    }
+  });
+
+  programDetailItems.forEach((item) => {
+    const programCopy = copy.programDetails[item.dataset.programDetail];
+
+    if (programCopy) {
+      item.textContent = programCopy;
     }
   });
 
