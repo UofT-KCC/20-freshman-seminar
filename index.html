@@ -40,7 +40,7 @@
                 <span data-intro-origin>SEOUL</span>
                 <i aria-hidden="true">✈</i>
                 <span data-intro-destination>TORONTO</span>
-                <strong data-intro-flight-time>JUL 11 · DEP 15:00 · ARR 18:00 KST</strong>
+                <strong data-intro-flight-time>AUG 22 · DEP 15:00 · ARR 18:00 EDT</strong>
               </div>
               <label class="name-step">
                 <span data-intro-label>Your boarding name</span>
@@ -57,16 +57,16 @@
               <fieldset class="destination-choice" data-destination-choice>
                 <legend data-destination-label>Choose your seminar city</legend>
                 <div class="destination-options">
-                  <label>
-                    <input type="radio" name="seminarLocation" value="seoul" data-location-input />
+                  <label class="is-unavailable" aria-disabled="true">
+                    <input type="radio" name="seminarLocation" value="seoul" data-location-input disabled />
                     <span>
                       <span class="destination-flag fi fi-kr" aria-hidden="true"></span>
                       <strong data-destination-option="seoulTitle">Seoul</strong>
-                      <small data-destination-option="seoulMeta">Yonsei · KST</small>
+                      <small data-destination-option="seoulMeta">Completed</small>
                     </span>
                   </label>
                   <label>
-                    <input type="radio" name="seminarLocation" value="toronto" data-location-input />
+                    <input type="radio" name="seminarLocation" value="toronto" data-location-input checked />
                     <span>
                       <span class="destination-flag fi fi-ca" aria-hidden="true"></span>
                       <strong data-destination-option="torontoTitle">Toronto</strong>
@@ -93,7 +93,7 @@
               <i aria-hidden="true">✈</i>
             </div>
             <div class="arrival-countdown" aria-label="Time before arrival">
-              <span data-countdown-label>Arriving in · KST</span>
+              <span data-countdown-label>Arriving in · EDT</span>
               <strong data-arrival-countdown>--d --h --m --s</strong>
             </div>
             <button class="pill-button" type="button" data-language aria-label="Change language">
@@ -121,21 +121,21 @@
               <article class="event-tile">
                 <ion-icon name="calendar-clear-outline" aria-hidden="true"></ion-icon>
                 <p data-event-detail="dateLabel">Seminar Date</p>
-                <strong data-event-detail="dateValue">July 11, 2026 (Sat)</strong>
+                <strong data-event-detail="dateValue">August 22, 2026 (Sat)</strong>
                 <span data-event-detail="timeValue">3:00 PM - 6:00 PM</span>
-                <small data-event-detail="timeNote">KST · 3 hours</small>
+                <small data-event-detail="timeNote">EDT · 3 hours</small>
               </article>
               <a
                 class="event-tile event-tile-link"
-                href="https://kko.to/IlnmU2PcdE"
+                href="https://www.google.com/maps/search/?api=1&query=Bahen%20Centre%20for%20Information%20Technology%20BA%201200%20University%20of%20Toronto"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="카카오맵에서 연세대학교 백양관 S208호 오는 길 보기"
+                aria-label="Open directions to Bahen Centre for Information Technology BA 1200 at University of Toronto"
               >
                 <ion-icon name="location-outline" aria-hidden="true"></ion-icon>
                 <p data-event-detail="locationLabel">Seminar Location</p>
-                <strong data-event-detail="locationValue">Baekyang Hall S208</strong>
-                <span data-event-detail="locationNote">Yonsei University</span>
+                <strong data-event-detail="locationValue">Bahen Centre BA 1200</strong>
+                <span data-event-detail="locationNote">University of Toronto</span>
                 <small class="event-link-hint">
                   <span data-event-detail="directionsLabel">Directions</span>
                   <ion-icon name="open-outline" aria-hidden="true"></ion-icon>
@@ -143,20 +143,17 @@
               </a>
               <a
                 class="event-tile event-tile-link afterparty-tile"
-                href="https://kko.to/bEmvarGx3s"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="카카오맵에서 2차 장소 현명포차 길찾기"
+                aria-disabled="true"
               >
                 <ion-icon name="restaurant-outline" aria-hidden="true"></ion-icon>
                 <p data-event-detail="afterpartyLabel">Afterparty Location</p>
-                <strong data-event-detail="afterpartyValue">Hyunmyeong Pocha</strong>
+                <strong data-event-detail="afterpartyValue">Afterparty TBA</strong>
                 <div class="afterparty-tags">
-                  <span data-event-detail="afterpartyGroupLabel">Food / drink groups</span>
-                  <span data-event-detail="afterpartyMinorLabel">Minors allowed</span>
+                  <span data-event-detail="afterpartyGroupLabel">Details coming soon</span>
+                  <span data-event-detail="afterpartyMinorLabel">Toronto local time</span>
                 </div>
                 <small class="event-link-hint">
-                  <span data-event-detail="afterpartyDirectionsLabel">Directions</span>
+                  <span data-event-detail="afterpartyDirectionsLabel">Details TBA</span>
                   <ion-icon name="open-outline" aria-hidden="true"></ion-icon>
                 </small>
               </a>

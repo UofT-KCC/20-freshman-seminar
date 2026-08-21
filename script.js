@@ -113,12 +113,12 @@ const seminarLocations = {
       kr: ["서울 출발 ", " 토론토 도착"],
     },
     countdown: {
-      en: "Arriving in · KST",
-      kr: "도착까지 · KST",
+      en: "Arrived · Toronto time",
+      kr: "도착 완료 · 토론토 시간",
     },
     introFlightTime: {
-      en: "JUL 11 · DEP 15:00 · ARR 18:00 KST",
-      kr: "7월 11일 · 15:00 - 18:00 KST",
+      en: "COMPLETED · TORONTO TIME",
+      kr: "완료됨 · 토론토 시간",
     },
     eventDetails: {
       en: {
@@ -158,7 +158,7 @@ const seminarLocations = {
     },
   },
   toronto: {
-    arrivalTime: "2026-07-18T18:00:00-04:00",
+    arrivalTime: "2026-08-22T18:00:00-04:00",
     origin: "SEOUL",
     destination: "TORONTO",
     route: {
@@ -170,15 +170,15 @@ const seminarLocations = {
       kr: "도착까지 · EDT",
     },
     introFlightTime: {
-      en: "JUL 18 · DEP 15:00 · ARR 18:00 EDT",
-      kr: "7월 18일 · 15:00 - 18:00 EDT",
+      en: "AUG 22 · DEP 15:00 · ARR 18:00 EDT",
+      kr: "8월 22일 · 15:00 - 18:00 EDT",
     },
     eventDetails: {
       en: {
-        dateValue: "July 18, 2026 (Sat)",
+        dateValue: "August 22, 2026 (Sat)",
         timeValue: "3:00 PM - 6:00 PM",
         timeNote: "EDT · 3 hours",
-        locationValue: "Bahen Centre BA 1190",
+        locationValue: "Bahen Centre BA 1200",
         locationNote: "University of Toronto",
         directionsLabel: "Directions",
         afterpartyValue: "Afterparty TBA",
@@ -187,10 +187,10 @@ const seminarLocations = {
         afterpartyDirectionsLabel: "Details TBA",
       },
       kr: {
-        dateValue: "2026. 7. 18. (토)",
+        dateValue: "2026. 8. 22. (토)",
         timeValue: "15:00 - 18:00",
         timeNote: "EDT · 총 3시간",
-        locationValue: "Bahen Centre BA 1190",
+        locationValue: "Bahen Centre BA 1200",
         locationNote: "University of Toronto",
         directionsLabel: "길찾기",
         afterpartyValue: "2차 장소 추후 공지",
@@ -201,8 +201,8 @@ const seminarLocations = {
     },
     links: {
       location: {
-        href: "https://www.google.com/maps/search/?api=1&query=Bahen%20Centre%20for%20Information%20Technology%20BA%201190%20University%20of%20Toronto",
-        aria: "Open directions to Bahen Centre for Information Technology BA 1190 at University of Toronto",
+        href: "https://www.google.com/maps/search/?api=1&query=Bahen%20Centre%20for%20Information%20Technology%20BA%201200%20University%20of%20Toronto",
+        aria: "Open directions to Bahen Centre for Information Technology BA 1200 at University of Toronto",
       },
       afterparty: null,
     },
@@ -218,7 +218,7 @@ const introCopy = {
     destinationLabel: "Choose your seminar city",
     destinations: {
       seoulTitle: "Seoul",
-      seoulMeta: "Yonsei · KST",
+      seoulMeta: "Completed",
       torontoTitle: "Toronto",
       torontoMeta: "U of T · EDT",
     },
@@ -236,7 +236,7 @@ const introCopy = {
     destinationLabel: "세미나 도시 선택",
     destinations: {
       seoulTitle: "서울",
-      seoulMeta: "연세대 · KST",
+      seoulMeta: "완료됨",
       torontoTitle: "토론토",
       torontoMeta: "U of T · EDT",
     },
@@ -456,9 +456,7 @@ function readSavedState() {
     introComplete: parsed?.introComplete === true,
     activePanel: savedPanel,
     screenDimmed: parsed?.screenDimmed === true,
-    seminarLocation: ["seoul", "toronto"].includes(parsed?.seminarLocation)
-      ? parsed.seminarLocation
-      : "seoul",
+    seminarLocation: "toronto",
   };
 }
 
@@ -886,7 +884,7 @@ languageButton.addEventListener("click", () => {
 
 locationInputs.forEach((input) => {
   input.addEventListener("change", () => {
-    if (!input.checked || !seminarLocations[input.value]) {
+    if (!input.checked || !seminarLocations[input.value] || input.disabled) {
       return;
     }
 

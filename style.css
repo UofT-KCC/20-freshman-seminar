@@ -413,6 +413,10 @@ a {
   cursor: pointer;
 }
 
+.destination-options label.is-unavailable {
+  cursor: not-allowed;
+}
+
 .destination-options input {
   position: absolute;
   inset: 0;
@@ -424,6 +428,7 @@ a {
 }
 
 .destination-options label > span {
+  position: relative;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
@@ -440,6 +445,23 @@ a {
     border-color 180ms ease,
     box-shadow 180ms ease,
     background 180ms ease;
+}
+
+.destination-options label.is-unavailable > span {
+  border-color: rgba(15, 23, 42, 0.06);
+  background: rgba(226, 232, 240, 0.48);
+  color: rgba(7, 31, 77, 0.38);
+  box-shadow: none;
+  filter: saturate(0.72);
+}
+
+.destination-options label.is-unavailable > span::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  backdrop-filter: blur(1px);
+  pointer-events: none;
 }
 
 .destination-options label > span::after {
@@ -532,6 +554,16 @@ a {
     inset 0 0 0 1px rgba(255, 255, 255, 0.16);
 }
 
+.destination-options label.is-unavailable .destination-flag {
+  opacity: 0.42;
+  filter: grayscale(1);
+}
+
+.destination-options label.is-unavailable strong,
+.destination-options label.is-unavailable small {
+  color: rgba(7, 31, 77, 0.42);
+}
+
 .destination-options input:focus-visible + span {
   outline: 2px solid rgba(0, 84, 184, 0.52);
   outline-offset: 2px;
@@ -540,6 +572,11 @@ a {
 .destination-options label:hover > span {
   border-color: rgba(0, 84, 184, 0.32);
   background: rgba(255, 255, 255, 0.9);
+}
+
+.destination-options label.is-unavailable:hover > span {
+  border-color: rgba(15, 23, 42, 0.06);
+  background: rgba(226, 232, 240, 0.48);
 }
 
 .name-card input {
